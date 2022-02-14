@@ -1,11 +1,17 @@
 Package: treecoding
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Title: Autoencoder via Random Trees (Encoder Forest)
+Version: 0.2.1
+Author: Juraj Szitas
+Maintainer: Juraj Szitas <Juraj_Szitas@swissre.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    stats,
+    furrr,
+    utils,
+    dplyr
+RoxygenNote: 7.1.2
