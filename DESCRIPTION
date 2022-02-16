@@ -12,6 +12,7 @@ LazyData: true
 Imports: 
     stats,
     furrr,
-    utils,
-    dplyr
+    purrr,
+    dplyr,
+    utils
 RoxygenNote: 7.1.2
