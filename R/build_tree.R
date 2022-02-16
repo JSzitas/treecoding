@@ -159,6 +159,7 @@ encoder_forest <- function(X,
       )
     }, .options = furrr::furrr_options(seed = TRUE))
   }
+  names(forest) <- seq_len(n_tree)
   structure( forest,
              class = "encoder_forest")
 }
