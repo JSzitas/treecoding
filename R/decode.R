@@ -28,6 +28,24 @@ decode_terminal_node <- function(terminal_node_df,
   )
 }
 
+reconcile_id <- function(df) {
+  purrr::map_dfc(df, function(col) {
+    if (is.numeric(col)) {
+      return(mean(col, na.rm = TRUE))
+    } else {
+      return(names(table(col))[1])
+    }
+  })
+}
+
+reconcile_by_id <- function(df) {
+  dplyr::bind_rows(
+    purrr::map(unique(df$id), function(id) {
+      reconcile_id(df[df$id == id, ])
+    })
+  )
+}
+
 #' Decoder
 #' @description Calculate an decoding from an object (generic method)
 #' @param object The object to use
@@ -46,27 +64,41 @@ decode.random_tree <- function(object, terminal_ids, ...) {
   terminal_values <- find_terminal_values(object)
 
   dplyr::bind_rows(
-           furrr::future_map(terminal_ids, function(id) {
-             decode_terminal_node( terminal_values[terminal_values$id == id, ],
-                                   ... )
-             }, .options = furrr::furrr_options(seed = TRUE)
-             )
+    furrr::future_map(terminal_ids, function(id) {
+      decode_terminal_node(
+        terminal_values[terminal_values$id == id, ],
+        ...
+      )
+    }, .options = furrr::furrr_options(seed = TRUE))
   )
 }
 #' @export
 #' @rdname decoder
 decode.encoder_forest <- function(object, terminal_ids, ...) {
   terminal_values <- furrr::future_map(object, find_terminal_values)
-  return(terminal_values)
-  furrr::future_map2(
-    terminal_ids, terminal_values,
+
+  id_vec <- seq_len(length(terminal_ids[[1]]))
+  result <- furrr::future_map2(terminal_ids,
+    terminal_values,
     function(id, values) {
-      return(NULL)
-      # dplyr::bind_rows( purrr::map( id,
-      #                               ~ decode_terminal_node( terminal_node_df = values[values$id == .x, ],
-      #                                                       ...)
-      #                               )
-      #                   )
-    }, .options = furrr::furrr_options(seed = TRUE)
+      cbind(
+        id = id_vec,
+        dplyr::bind_rows(purrr::map(
+          id,
+          function(id) {
+            decode_terminal_node(
+              terminal_node_df = values[values$id == id, ],
+              ...
+            )
+          }
+        ))
+      )
+    },
+    .options = furrr::furrr_options(seed = TRUE)
   )
+  as.data.frame(
+    reconcile_by_id(
+      dplyr::bind_rows(result)
+    )
+  )[-c(1)]
 }
