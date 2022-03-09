@@ -58,7 +58,7 @@ split <- function(X, max_depth = 5, current_depth = 1, node_id = 1,
   col <- sample(seq_len(ncol(X)), 1)
   # reaching a terminal node - you run out of data, or you reach max_depth, or
   # you have a constant column
-  if (current_depth == max_depth || nrow(X) < 2 || all(X[, col] == X[1, col])) {
+  if (current_depth == max_depth || nrow(X) < 2){ #|| ( length(unique( X[, col] )) < 2)) {
     # consider a nicer way to denote terminal nodes than just having them be a character
     return(list(
       rule = "terminal_node",
@@ -66,7 +66,8 @@ split <- function(X, max_depth = 5, current_depth = 1, node_id = 1,
       # pruning rules that have become redundant (ie for each column just
       # take the last available set of rules)
       terminal_rules = terminal_rules, # resolve_terminal_rules(terminal_rules),
-      node_id = node_id
+      node_id = node_id,
+      n = nrow(X)
     ))
   }
   rule <- find_rule(X, col)
@@ -117,49 +118,4 @@ random_tree <- function(X, max_depth = 10) {
     split(X, max_depth = max_depth),
     class = "random_tree"
   )
-}
-
-#' Encoder forest
-#' @description Fit an encoder forest to your data
-#' @param X The data to use.
-#' @param max_depth The maximal depth of the tree.
-#' @param n_tree The number of trees used.
-#' @param subsample_size The number of rows allocated to each tree.
-#' @param resample Whether to resample rows when creating samples of data for trees.
-#' @param ... Additional arguments (for future compatibility).
-#' @return A fitted encoder forest
-#' @export
-encoder_forest <- function(X,
-                           max_depth = 12,
-                           n_tree = 1000,
-                           subsample_size = max(126, nrow(X) / n_tree),
-                           resample = ifelse(subsample_size < (nrow(X) / n_tree),
-                             TRUE,
-                             FALSE
-                           ),
-                           ...) {
-  if (resample) {
-    forest <- furrr::future_map(
-      seq_len(n_tree),
-      function(i) {
-        # fit a tree on a random sample
-        random_tree(X[sample(seq_len(nrow(X)),
-          size = subsample_size
-        ), ],
-        max_depth = max_depth
-        )
-      },.options = furrr::furrr_options(seed = TRUE)
-    )
-  } else {
-    tree_folds <- resample_folds(nrow(X), subsample_size)
-    forest <- furrr::future_map(tree_folds, function(fold) {
-      # fit a tree on a predetermined fold
-      random_tree(X[fold, ],
-        max_depth = max_depth
-      )
-    }, .options = furrr::furrr_options(seed = TRUE))
-  }
-  names(forest) <- seq_len(n_tree)
-  structure( forest,
-             class = "encoder_forest")
 }
