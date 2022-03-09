@@ -75,7 +75,7 @@ decode.random_tree <- function(object, terminal_ids, ...) {
 #' @export
 #' @rdname decoder
 decode.encoder_forest <- function(object, terminal_ids, ...) {
-  terminal_values <- furrr::future_map(object, find_terminal_values)
+  terminal_values <- furrr::future_map(object$forest, find_terminal_values)
 
   id_vec <- seq_len(length(terminal_ids[[1]]))
   result <- furrr::future_map2(terminal_ids,
