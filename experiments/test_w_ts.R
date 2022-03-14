@@ -18,22 +18,25 @@ electricity <- tsibbledata::vic_elec %>%
   as.data.frame()
 
 
-# tree <- random_tree(electricity)
-# encoded_tree <- encode( tree, electricity )
-# decoded_tree <- decode( tree, encoded_tree )
+tree <- random_tree(electricity, max_depth = 16)
+encoded_tree <- encode( tree, electricity )
+decoded_tree <- decode( tree, encoded_tree )
 
 # # future::plan("multisession")
 # # future::plan("sequential")
 
-forest <- encoder_forest( electricity, n_tree = 10, max_depth = 8, subsample_size = 2000 )
+tictoc::tic("Time to fit forest:")
+forest <- encoder_forest( electricity, n_tree = 100, max_depth = 8, subsample_size = 2000 )
+tictoc::toc()
+
+tictoc::tic("Time to encode:")
 encoded_forest <- encode( forest, electricity )
+tictoc::toc()
+
+tictoc::tic("Time to decode:")
 decoded_forest <- decode( forest, encoded_forest )
+tictoc::toc()
 
-
-# larger
-# forest2 <- encoder_forest( electricity, n_tree = 50, max_depth = 8, subsample_size = 2000 )
-# encoded_forest2 <- encode( forest2, electricity )
-# decoded_forest2 <- decode( forest2, encoded_forest2 )
 
 
 

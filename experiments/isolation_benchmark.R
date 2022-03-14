@@ -4,7 +4,6 @@ pkgload::load_all()
 
 set.seed(1071)
 
-
 anomaly_generator <- function( n= 5000, p = 10, anomalies = 100  ) {
   X <- matrix( rnorm( n*p, 0, 1), nrow = n, ncol = p)
   anom <- purrr::map( seq_len(p), ~ ceiling(runif(1)*anomalies))
@@ -12,8 +11,8 @@ anomaly_generator <- function( n= 5000, p = 10, anomalies = 100  ) {
 
   X <- purrr::imap( anom, function(anomalies, index) {
     X[anomalies,index] <- rnorm(anomalies,
-                                mean = rnorm(1, sd = 100),
-                                sd = abs(rnorm(1, 0, sd = 100)))
+                                mean = rnorm(1, sd = 250),
+                                sd = abs(rnorm(1, 0, sd = 250)))
     return(X[,index])
   })
 
@@ -27,11 +26,11 @@ df <- anomaly_generator()
 
 
 
-fit <- encoder_forest( df[,1:10],
+fit <- encoder_forest( df,
                        max_depth = 8,
-                       n_tree = 100 )
+                       n_tree = 200 )
 
-scores <- isolation( fit, df[,1:10]  )
+scores <- isolation( fit, df  )
 
 
 
