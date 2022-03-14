@@ -32,8 +32,8 @@ encoder_forest <- function(X,
     )
   } else {
     if(is.null(subsample_size)) {
-      tree_folds <- purrr::map( seq_len(n_tree),
-                                ~seq_len(nrow(X)) )
+      tree_folds <- lapply( seq_len(n_tree),
+                            function(sample){ seq_len(nrow(X))} )
     }
     else {
       tree_folds <- resample_folds(nrow(X), subsample_size)

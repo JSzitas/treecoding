@@ -3,34 +3,27 @@ c_factor <- function(n) {
   H <- log(n - 1) + 0.5772156649
   return(2 * H - (2*(n - 1)/n))
 }
-
-traversal_isolation_score <- function(tree, row, current_depth = 0) {
+traversal_isolation_score_vec <- function(tree, X, id = seq_len(nrow(X)), current_depth = 0) {
+  if(length(id) == 0) {
+    return()
+  }
   if (is.character(tree$rule)) {
-    return(current_depth + c_factor(tree$n) )
+    return(data.frame( id = id,
+                       score =  current_depth + c_factor(tree$n) )
+           )
   }
   # if the column is of type numeric
   if (is.numeric(tree$rule$rule)) {
-    # check whether we go left (value is smaller than the upper boundary of our rule)
-    if (row[tree$rule$column] <= tree$rule$rule) {
-      traversal_isolation_score(tree$left, row, current_depth + 1)
-    }
-    # or right - value greater than that.
-    else {
-      traversal_isolation_score(tree$right, row, current_depth + 1)
-    }
+    left_going <- X[id,tree$rule$column] <= tree$rule$rule
   }
   # if column is of a different type - ie character
   else {
-    # either the row is in the current set of rules (goes left)
-    if (row[tree$rule$column] %in% tree$rule$rule) {
-      traversal_isolation_score(tree$left, row, current_depth + 1)
-    } else {
-      # or it goes right
-      traversal_isolation_score(tree$right, row, current_depth + 1)
-    }
+    left_going <- X[id,tree$rule$column] %in% tree$rule$rule
   }
+  rbind( traversal_isolation_score_vec(tree$left, X, id = id[left_going], current_depth + 1 ),
+         traversal_isolation_score_vec(tree$right, X, id =  id[!left_going], current_depth + 1 )
+  )
 }
-
 #' Isolation forest score
 #' @description Calculate an isolation score from an object (generic method)
 #' @param object The object to use
@@ -45,11 +38,8 @@ isolation <- function(object, ...) {
 #' @export
 #' @rdname isolation
 isolation.random_tree <- function(object, X, ...) {
-  isolation_scores <- rep(NA, nrow(X))
-  for (row in seq_len(nrow(X))) {
-    isolation_scores[row] <- traversal_isolation_score(object, X[row, ])
-  }
-  return(isolation_scores)
+  result <- traversal_isolation_score_vec(object, X)
+  result[ order(result$id),]$score
 }
 #' @export
 #' @rdname isolation
