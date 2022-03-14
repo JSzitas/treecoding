@@ -1,9 +1,10 @@
-#' @importFrom stats runif
 #' @importFrom furrr future_map
 #' @importFrom furrr furrr_options
-#' @importFrom stats setNames
-#' @importFrom purrr map_dfc
-#' @importFrom dplyr bind_rows
+#' @importFrom stats runif
+#' @importFrom data.table rbindlist
+#' @importFrom purrr imap
+#' @importFrom data.table as.data.table
+#' @importFrom data.table dcast
 #' @importFrom purrr map
-#' @importFrom furrr future_map2
+#' @importFrom data.table :=
 NULL

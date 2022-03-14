@@ -10,9 +10,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    stats,
     furrr,
-    purrr,
-    dplyr,
-    utils
+    stats,
+    data.table,
+    purrr
 RoxygenNote: 7.1.2
