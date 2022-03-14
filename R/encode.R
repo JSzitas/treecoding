@@ -1,28 +1,23 @@
-traversal_id <- function(tree, row) {
+# possibly further speedups by passing X in an environment and doing environment lookup
+# which should give us 'by reference' behaviour and thus avoid copying
+traversal_id_vec <- function(tree, X, id = seq_len(nrow(X))) {
+  if(length(id) == 0) {
+    return()
+  }
   if (is.character(tree$rule)) {
-    return(tree$node_id)
+    return(data.frame( id = id, node_id = tree$node_id))
   }
   # if the column is of type numeric
   if (is.numeric(tree$rule$rule)) {
-    # check whether we go left (value is smaller than the upper boundary of our rule)
-    if (row[tree$rule$column] <= tree$rule$rule) {
-      traversal_id(tree$left, row)
-    }
-    # or right - value greater than that.
-    else {
-      traversal_id(tree$right, row)
-    }
+    left_going <- X[id,tree$rule$column] <= tree$rule$rule
   }
   # if column is of a different type - ie character
   else {
-    # either the row is in the current set of rules (goes left)
-    if (row[tree$rule$column] %in% tree$rule$rule) {
-      traversal_id(tree$left, row)
-    } else {
-      # or it goes right
-      traversal_id(tree$right, row)
-    }
+    left_going <- X[id,tree$rule$column] %in% tree$rule$rule
   }
+  rbind( traversal_id_vec(tree$left, X, id = id[left_going] ),
+         traversal_id_vec(tree$right, X, id =  id[!left_going] )
+  )
 }
 #' Encoder
 #' @description Calculate an encoding from an object (generic method)
@@ -38,11 +33,8 @@ encode <- function(object, ...) {
 #' @export
 #' @rdname encoder
 encode.random_tree <- function(object, X, ...) {
-  encoded <- rep(NA, nrow(X))
-  for (row in seq_len(nrow(X))) {
-    encoded[row] <- traversal_id(object, X[row, ])
-  }
-  return(encoded)
+  result <- traversal_id_vec(object, X)
+  result[ order(result$id),]$node_id
 }
 #' @export
 #' @rdname encoder

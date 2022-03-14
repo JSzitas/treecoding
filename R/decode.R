@@ -1,4 +1,3 @@
-
 find_terminal_values <- function(tree, terminals = list(), ...) {
   if (is.character(tree$rule)) {
     # the casting might look a bit awkward, but it lets us keep a list column
@@ -15,35 +14,29 @@ find_terminal_values <- function(tree, terminals = list(), ...) {
     find_terminal_values(tree$right)
   )
 }
-
-decode_terminal_node <- function(terminal_node_df,
-                                 method = list(mean_sample, random_sample, first, last)[[1]],
-                                 ...) {
-  values <- terminal_node_df$values
-  result <- lapply(values, method)
-
-  stats::setNames(
-    data.frame(result),
-    terminal_node_df$column
-  )
-}
-
-reconcile_id <- function(df) {
-  purrr::map_dfc(df, function(col) {
-    if (is.numeric(col)) {
-      return(mean(col, na.rm = TRUE))
-    } else {
-      return(names(table(col))[1])
-    }
-  })
-}
-
-reconcile_by_id <- function(df) {
-  dplyr::bind_rows(
-    purrr::map(unique(df$id), function(id) {
-      reconcile_id(df[df$id == id, ])
+flatten_encoded_forest <- function( forest ) {
+  data.table::rbindlist(
+    purrr::imap( forest, function(tree, id) {
+      data.frame( row_id = seq_len(length(tree)),tree_id = id, node_id = tree )
     })
   )
+}
+
+decode_terminal_nodes <- function(terminal_node_df,
+                                  method = list(mean_sample, random_sample, first, last)[[1]],
+                                  ...) {
+  as.data.frame(
+    cbind( column = unlist(terminal_node_df$column),
+           node_id = unlist(terminal_node_df$id),
+           value = sapply(terminal_node_df$values, method)
+    )
+  )
+}
+reconcile_column <- function( x ) {
+  if (is.numeric(x)) {
+    return(mean(x, na.rm = TRUE))
+  }
+  names(table(x))[1]
 }
 
 #' Decoder
@@ -61,44 +54,50 @@ decode <- function(object, ...) {
 #' @export
 #' @rdname decoder
 decode.random_tree <- function(object, terminal_ids, ...) {
-  terminal_values <- find_terminal_values(object)
-
-  dplyr::bind_rows(
-    furrr::future_map(terminal_ids, function(id) {
-      decode_terminal_node(
-        terminal_values[terminal_values$id == id, ],
-        ...
-      )
-    }, .options = furrr::furrr_options(seed = TRUE))
-  )
+  # appease data.table
+  column <- row_id <- value <- NULL
+  # terminal_values <- find_terminal_values(object)
+  result <- decode_terminal_nodes(
+    find_terminal_values(object)
+    )
+  # coerce terminal_ids into a data.frame for joins
+  flattened_tree <- data.frame( node_id = terminal_ids,
+                                row_id = seq_len(length(terminal_ids)))
+  # merge flattened terminal_ids with result of terminal value decoding
+  result <- merge( data.table::as.data.table(result),
+                   flattened_tree, on = c("node_id"), allow.cartesian = TRUE )
+  # drop tree_id and node_id
+  result[, ("node_id") := NULL]
+  # reconcile the values
+  result <- result[, reconcile_column(value), by= list(row_id, column)]
+  # and cast to a wider format
+  result <- data.table::dcast(result, row_id~column, value.var = "V1")
+  # drop index and return
+  return(as.data.frame(result[,-c(1)]))
 }
 #' @export
 #' @rdname decoder
+#' @importFrom data.table .SD
 decode.encoder_forest <- function(object, terminal_ids, ...) {
-  terminal_values <- furrr::future_map(object$forest, find_terminal_values)
-
-  id_vec <- seq_len(length(terminal_ids[[1]]))
-  result <- furrr::future_map2(terminal_ids,
-    terminal_values,
-    function(id, values) {
-      cbind(
-        id = id_vec,
-        dplyr::bind_rows(purrr::map(
-          id,
-          function(id) {
-            decode_terminal_node(
-              terminal_node_df = values[values$id == id, ],
-              ...
-            )
-          }
-        ))
-      )
-    },
-    .options = furrr::furrr_options(seed = TRUE)
+  # appease data.table
+  column <- row_id <- value <- NULL
+  terminal_values <- purrr::map(object$forest, find_terminal_values, ...)
+  # decode all terminal nodes
+  result <- data.table::rbindlist(
+    purrr::imap( terminal_values, function(values, index) cbind(tree_id = index,
+                                                              decode_terminal_nodes(values))
+               )
   )
-  as.data.frame(
-    reconcile_by_id(
-      dplyr::bind_rows(result)
-    )
-  )[-c(1)]
+  # flatten forest generated ids to a table
+  flattened_forest <- flatten_encoded_forest(terminal_ids)
+  # merge flattened terminal_ids with result of terminal value decoding
+  result <- merge( result, flattened_forest, on = c("node_id","tree_id"), allow.cartesian = TRUE )
+  # drop tree_id and node_id
+  result[, (c("tree_id","node_id")) := NULL]
+  # reconcile the values
+  result <- result[, reconcile_column(value), by= list(row_id, column)]
+  # and cast to a wider format
+  result <- data.table::dcast(result, row_id~column, value.var = "V1")
+  # drop index and return
+  return(as.data.frame(result[,-c(1)]))
 }
