@@ -16,9 +16,11 @@ is_encoder_forest <- function( x ) {
     j <- integer()
   }
   if( drop ) {
-    return(unclass(x)[j])
+    return(unclass(x)[["forest"]][j])
   }
-  structure( unclass(x)[j], class = "encoder_forest" )
+  structure( list( forest = unclass(x)[["forest"]][j],
+                   Phi = x[["Phi"]]),
+             class = "encoder_forest" )
 }
 #' @export
 `[[.encoder_forest` <- function (x, i, j, ..., exact = TRUE)
