@@ -8,7 +8,7 @@ encoder_forest(
   X,
   max_depth = 12,
   n_tree = 1000,
-  subsample_size = max(126, nrow(X)/n_tree),
+  subsample_size = 2^max_depth,
   resample = ifelse(subsample_size < (nrow(X)/n_tree), TRUE, FALSE),
   ...
 )
