@@ -4,7 +4,7 @@ pkgload::load_all()
 
 set.seed(1071)
 
-anomaly_generator <- function( n= 5000, p = 10, anomalies = 100  ) {
+anomaly_generator <- function( n = 5000, p = 10, anomalies = 100  ) {
   X <- matrix( rnorm( n*p, 0, 1), nrow = n, ncol = p)
   anom <- purrr::map( seq_len(p), ~ ceiling(runif(1)*anomalies))
   anom <- purrr::map( anom, ~ sample( seq_len(nrow(X)), .x) )
