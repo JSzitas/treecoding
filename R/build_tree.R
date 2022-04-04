@@ -1,21 +1,23 @@
 # find rule - currently only supports numeric columns
-find_rule <- function(X, column) {
+find_rule <- function(X, row_id, column) {
 
   # numeric rules
   if (is.numeric(X[, column])) {
-    rule <- stats::runif(1, min(X[, column]), max(X[, column]))
 
-    left <- X[X[, column] <= rule, , drop = FALSE]
-    right <- X[X[, column] > rule, , drop = FALSE]
+    left_rule <- min(X[row_id, column], na.rm = TRUE)
+    right_rule <- max(X[row_id, column], na.rm = TRUE)
 
-    left_rule <- min(X[, column])
-    right_rule <- max(X[, column])
+    rule <- stats::runif(1, left_rule, right_rule)
+
+    left <- row_id[X[row_id, column] <= rule]
+    right <- row_id[X[row_id, column] > rule]
+
     rule <- list(
       left = c(left_rule, rule),
       right = c(rule, right_rule)
     )
   } else {
-    unique_levels <- unique(X[, column])
+    unique_levels <- unique(X[row_id, column])
     # randomly permute all levels
     permutation <- sample(unique_levels, length(unique_levels))
     # find 'position' of rule
@@ -24,8 +26,8 @@ find_rule <- function(X, column) {
     left_rule <- permutation[seq_len(length(permutation)) <= position]
     right_rule <- permutation[seq_len(length(permutation)) > position]
 
-    left <- X[X[, column] %in% left_rule, , drop = FALSE]
-    right <- X[X[, column] %in% right_rule, , drop = FALSE]
+    left <- row_id[X[row_id, column] %in% left_rule]
+    right <- row_id[X[row_id, column] %in% right_rule]
     rule <- list(
       left = left_rule,
       right = right_rule
@@ -40,8 +42,8 @@ find_rule <- function(X, column) {
   )
 }
 
-distill_rule <- function( rule ) {
-  if( is.numeric(rule) ) {
+distill_rule <- function(rule) {
+  if (is.numeric(rule)) {
     return(max(rule))
   }
   return(rule)
@@ -53,12 +55,23 @@ add_rule <- function(ruleset = list(),
   return(ruleset)
 }
 
-split <- function(X, max_depth = 5, current_depth = 1, node_id = 1,
-                  terminal_rules = list(), ...) {
+sampler_nada <- function(...) {
+  NULL
+}
+
+split <- function(X,
+                  row_id = seq_len(nrow(X)),
+                  max_depth = 5,
+                  current_depth = 1,
+                  node_id = 1,
+                  terminal_rules = list(),
+                  parameter_sampler = sampler_nada,
+                  min_nodesize = 15,
+                  ...) {
   col <- sample(seq_len(ncol(X)), 1)
   # reaching a terminal node - you run out of data, or you reach max_depth, or
   # you have a constant column
-  if (current_depth == max_depth || nrow(X) < 2){ #|| ( length(unique( X[, col] )) < 2)) {
+  if (current_depth == max_depth || length(row_id) < min_nodesize) {
     # consider a nicer way to denote terminal nodes than just having them be a character
     return(list(
       rule = "terminal_node",
@@ -67,17 +80,19 @@ split <- function(X, max_depth = 5, current_depth = 1, node_id = 1,
       # take the last available set of rules)
       terminal_rules = terminal_rules, # resolve_terminal_rules(terminal_rules),
       node_id = node_id,
-      n = nrow(X)
+      n = length(row_id),
+      parameter_estimates = parameter_sampler(X, row_id)
     ))
   }
-  rule <- find_rule(X, col)
+  rule <- find_rule(X, row_id, col)
 
   list(
     rule = list(
       column = rule$column,
       rule = distill_rule(rule$rule$left)
     ),
-    left = split(rule$left,
+    left = split(X,
+      rule$left,
       max_depth,
       current_depth + 1,
       # nodes use a simple numbering scheme - the left ones are even
@@ -90,9 +105,12 @@ split <- function(X, max_depth = 5, current_depth = 1, node_id = 1,
           column = rule$column,
           rule = rule$rule$left
         )
-      )
+      ),
+      parameter_sampler = parameter_sampler,
+      min_nodesize = min_nodesize
     ),
-    right = split(rule$right,
+    right = split(X,
+      rule$right,
       max_depth,
       current_depth + 1,
       2 * node_id + 1,
@@ -101,7 +119,9 @@ split <- function(X, max_depth = 5, current_depth = 1, node_id = 1,
           column = rule$column,
           rule = rule$rule$right
         )
-      )
+      ),
+      parameter_sampler = parameter_sampler,
+      min_nodesize = min_nodesize
     ),
     node_id = node_id
   )
@@ -111,11 +131,12 @@ split <- function(X, max_depth = 5, current_depth = 1, node_id = 1,
 #' @description Fit a random tree to your data.
 #' @param X The data to use - currently only supports a matrix.
 #' @param max_depth The maximal depth of the tree (though the tree might be shorter - this is an upper bound).
+#' @param ... Additional arguments.
 #' @return A fitted tree
 #' @export
-random_tree <- function(X, max_depth = 10) {
+random_tree <- function(X, max_depth = 10, ...) {
   structure(
-    split(X, max_depth = max_depth),
+    split(X, max_depth = max_depth, ...),
     class = "random_tree"
   )
 }

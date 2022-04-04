@@ -3,8 +3,9 @@
 #' @importFrom stats runif
 #' @importFrom data.table rbindlist
 #' @importFrom purrr imap
+#' @importFrom stats median
+#' @importFrom data.table data.table
 #' @importFrom data.table as.data.table
 #' @importFrom data.table dcast
 #' @importFrom purrr map
-#' @importFrom data.table :=
 NULL

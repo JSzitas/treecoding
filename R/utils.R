@@ -9,31 +9,11 @@ resample_folds <- function( range = 10, size = 2 ) {
   }
   return(folds)
 }
-
-first <- function(x) {
-  if( length(x) == 0) {
-    return(NA)
-  }
-  x[[1]]
+is_numeric <- function( x ) {
+  suppressWarnings(
+    !all( is.na( as.numeric( x ) ))
+  )
 }
-
-last <- function(x) {
-  if( length(x) == 0) {
-    return(NA)
-  }
-  x[[length(x)]]
-}
-
-random_sample <- function(x) {
-  if( length(x) == 0) {
-    return(NA)
-  }
-  if( is.character(x) ) {
-    return( sample( x, 1 ))
-  }
-  return( stats::runif(1, min(x), max(x)))
-}
-
 mean_sample <- function(x) {
   if( length(x) == 0) {
     return(NA)
@@ -42,4 +22,13 @@ mean_sample <- function(x) {
       return( sample( x, 1 ))
   }
   return( mean(x) )
+}
+median_sample <- function(x) {
+  if( length(x) == 0) {
+    return(NA)
+  }
+  if( is.character(x) ) {
+    return( sample( x, 1 ))
+  }
+  return( median(x) )
 }

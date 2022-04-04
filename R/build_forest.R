@@ -1,4 +1,3 @@
-
 #' Encoder forest
 #' @description Fit an encoder forest to your data
 #' @param X The data to use.
@@ -26,7 +25,8 @@ encoder_forest <- function(X,
         random_tree(X[sample(seq_len(nrow(X)),
                              size = subsample_size
         ), ],
-        max_depth = max_depth
+        max_depth = max_depth,
+        ...
         )
       },.options = furrr::furrr_options(seed = TRUE)
     )
@@ -41,7 +41,8 @@ encoder_forest <- function(X,
     forest <- furrr::future_map(tree_folds, function(fold) {
       # fit a tree on a predetermined fold
       random_tree(X[fold, ],
-                  max_depth = max_depth
+                  max_depth = max_depth,
+                  ...
       )
     }, .options = furrr::furrr_options(seed = TRUE))
   }

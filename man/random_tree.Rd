@@ -4,12 +4,14 @@
 \alias{random_tree}
 \title{Build a random tree}
 \usage{
-random_tree(X, max_depth = 10)
+random_tree(X, max_depth = 10, ...)
 }
 \arguments{
 \item{X}{The data to use - currently only supports a matrix.}
 
 \item{max_depth}{The maximal depth of the tree (though the tree might be shorter - this is an upper bound).}
+
+\item{...}{Additional arguments.}
 }
 \value{
 A fitted tree
