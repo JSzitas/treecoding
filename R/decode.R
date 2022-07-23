@@ -106,7 +106,13 @@ decode.encoder_forest <- function(object, terminal_ids, ...) {
   flattened_forest[, tree_id := as.integer(tree_id)]
   flattened_forest[, node_id := as.integer(node_id)]
   result <- merge( result, flattened_forest, on = c("node_id","tree_id"), allow.cartesian = TRUE )
+  # return(result)
   result[, (c("node_id","tree_id")) := NULL]
+  # result <- tidyr::pivot_wider( result, names_from = "column", values_from = "value", values_fn = reconcile_intervals )
+  # # result <- data.table::dcast( result, row_id ~ column, value.var = "value", fun.aggregate = reconcile_intervals)
+  # return(result)
+return(result)
+
   # reconcile and cast to wide
   result <- result[, as.character(reconcile_intervals( value )), by = list( column, row_id )  ]
   result <- data.table::dcast( result, row_id ~ column, value.var = "V1")

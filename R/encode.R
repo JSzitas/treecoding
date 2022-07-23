@@ -15,6 +15,9 @@ traversal_id_vec <- function(tree, X, id = seq_len(nrow(X))) {
   else {
     left_going <- X[id,tree$rule$column] %in% tree$rule$rule
   }
+  if( !tree$rule$na_dir ) {
+    left_going <- left_going | is.na(X[id, tree$rule$column])
+  }
   rbind( traversal_id_vec(tree$left, X, id = id[left_going] ),
          traversal_id_vec(tree$right, X, id =  id[!left_going] )
   )

@@ -38,7 +38,8 @@ isolation <- function(object, ...) {
 #' @export
 #' @rdname isolation
 isolation.random_tree <- function(object, X, ...) {
-  result <- traversal_isolation_score_vec(object, X)
+  result <- traversal_isolation_score_vec(object[["tree"]], X)
+  # result
   result[ order(result$id),]$score
 }
 #' @export
