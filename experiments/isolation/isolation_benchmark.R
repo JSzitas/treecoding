@@ -1,6 +1,7 @@
 # isolation benchmark
 remove(list=ls())
 pkgload::load_all()
+library(magrittr)
 
 set.seed(1071)
 
@@ -24,7 +25,7 @@ anomaly_generator <- function( n = 5000, p = 10, anomalies = 100  ) {
 
 df <- anomaly_generator()
 
-
+# fit <- random_tree( df, max_depth = 8 )
 
 fit <- encoder_forest( df,
                        max_depth = 8,
@@ -32,7 +33,9 @@ fit <- encoder_forest( df,
 
 scores <- isolation( fit, df  )
 
-
+data.frame( anom = df$anomaly, score = scores ) %>%
+  ggplot2::ggplot(ggplot2::aes(x = score, colour = as.factor(anom))) +
+    ggplot2::geom_density()
 
 
 

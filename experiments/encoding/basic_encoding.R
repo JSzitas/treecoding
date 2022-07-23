@@ -40,6 +40,9 @@ rmse <- function(x,y) { sqrt(mean((x-y)^2, na.rm = TRUE)) }
 sprintf( "Average Categorical reconstruction accuracy: %f",
          mean(sapply( 1:l,function(column){ accuracy( table(df[[column]], decoded_forest[[column]]) )  }))
        )
+sprintf( "Average Numeric reconstruction rmse: %f",
+         mean(sapply( ((l+1):(p+l)),function(column){ rmse( df[[column]], decoded_forest[[column]] )  }))
+)
 sprintf( "Average Numeric reconstruction inverse rmse: %f",
          mean(sapply( ((l+1):(p+l)),function(column){ 1/rmse( df[[column]], decoded_forest[[column]] )  }))
 )
