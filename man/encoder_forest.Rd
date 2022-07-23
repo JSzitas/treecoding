@@ -9,6 +9,7 @@ encoder_forest(
   max_depth = 12,
   n_tree = 1000,
   subsample_size = 2^max_depth,
+  row_id = NULL,
   resample = ifelse(subsample_size < (nrow(X)/n_tree), TRUE, FALSE),
   ...
 )
@@ -21,6 +22,8 @@ encoder_forest(
 \item{n_tree}{The number of trees used.}
 
 \item{subsample_size}{The number of rows allocated to each tree.}
+
+\item{row_id}{Pass a **row_id** as necessary, if **NULL**, use all observations.}
 
 \item{resample}{Whether to resample rows when creating samples of data for trees.}
 
