@@ -1,29 +1,28 @@
 # find rule - currently only supports numeric columns
 find_rule <- function(X, row_id, available_columns, ...) {
-
   column <- sample(available_columns, 1)
 
-  mia <- is.na( X[row_id, column] )
+  mia <- is.na(X[row_id, column])
   row_id <- row_id[!mia]
-  if( length(row_id) == 0 ) {
+  if (length(row_id) == 0) {
     return(
       list(
-      column = column,
-      rule = NULL,
-      left = NULL,
-      right = NULL,
-      mia_dir = NULL
-    )
+        column = column,
+        rule = NULL,
+        left = NULL,
+        right = NULL,
+        mia_dir = NULL
+      )
     )
   }
 
   # numeric rules
   if (is.numeric(X[, column])) {
     left_rule <- min(X[row_id, column])
-    right_rule <- max(X[row_id, column] )
+    right_rule <- max(X[row_id, column])
 
     rule <- stats::runif(1, left_rule, right_rule)
-    if( is.na(rule) ) {
+    if (is.na(rule)) {
       print(mia)
       print(row_id)
       return(list(rule = NULL))
@@ -53,13 +52,12 @@ find_rule <- function(X, row_id, available_columns, ...) {
       right = right_rule
     )
   }
-  mia_dir <- rbinom( 1, 1, 0.5 )
+  mia_dir <- rbinom(1, 1, 0.5)
   # either send mia observations left or right, with equal probability
-  if(  mia_dir == TRUE ) {
+  if (mia_dir == TRUE) {
     # 1 is for right
     right <- c(right, which(mia))
-  }
-  else {
+  } else {
     # 0 is for left
     left <- c(left, which(mia))
   }
@@ -102,7 +100,7 @@ split <- function(X,
   # return(rule)
   # reaching a terminal node - you run out of data, or you reach max_depth, or
   # you have a constant column
-  if (current_depth == max_depth || length(na.omit(row_id)) <= min_nodesize || is.null( rule$rule )) {
+  if (current_depth == max_depth || length(na.omit(row_id)) <= min_nodesize || is.null(rule$rule)) {
     # consider a nicer way to denote terminal nodes than just having them be a character
     return(list(
       rule = "terminal_node",
@@ -191,20 +189,22 @@ random_tree <- function(X, max_depth = 10, split_finder = find_rule,
   if (!is.null(nosplit_columns)) {
     available_columns <- available_columns[-parse_nosplit_columns(X, nosplit_columns)]
   }
-  if(is.null(row_id)) {
+  if (is.null(row_id)) {
     row_id <- seq_len(nrow(X))
   }
 
-  result <- list( tree = split(X, row_id = row_id, max_depth = max_depth, split_finder,
-                               available_columns = available_columns, ...)
-  )
+  result <- list(tree = split(X,
+    row_id = row_id, max_depth = max_depth, split_finder,
+    available_columns = available_columns, ...
+  ))
 
-  maybe_oob_obs <- X[list( setdiff( seq_len(nrow(X)), row_id ),
-                           which(seq_len(nrow(X)) > max(row_id))
-  )[[chronological_oob + 1]],]
+  maybe_oob_obs <- X[list(
+    setdiff(seq_len(nrow(X)), row_id),
+    which(seq_len(nrow(X)) > max(row_id))
+  )[[chronological_oob + 1]], ]
 
-  if( nrow(maybe_oob_obs) > 0) {
-    result <- c( result, list(oob_obs = maybe_oob_obs ))
+  if (nrow(maybe_oob_obs) > 0) {
+    result <- c(result, list(oob_obs = maybe_oob_obs))
   }
 
   structure(

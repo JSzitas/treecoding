@@ -1,22 +1,21 @@
 sample_from_range <- function(X, row_id, available_columns, ranges) {
-
   new_weights <- ranges_to_weights(ranges)
   # new_weights <- new_weights / sum(new_weights)
   # sample column, using available ranges weights
-  column <- sample( available_columns, 1,
-                    prob = new_weights/sum(new_weights)
+  column <- sample(available_columns, 1,
+    prob = new_weights / sum(new_weights)
   )
 
-  mia <- is.na( X[row_id, column] )
+  mia <- is.na(X[row_id, column])
   row_id <- row_id[!mia]
   # compute E by sampling from exponential distribution with rate sum(ranges)
   E <- rexp(1, rate = sum(new_weights))
 
-  if( length(row_id) == 0 || (E > tau) ) {
+  if (length(row_id) == 0 || (E > tau)) {
     return(
       list(
         column = column,
-        tau = sum( tau, E),
+        tau = sum(tau, E),
         rule = NULL,
         left = NULL,
         right = NULL,
@@ -25,7 +24,7 @@ sample_from_range <- function(X, row_id, available_columns, ranges) {
     )
   }
 
-  tau <- sum( tau, E)
+  tau <- sum(tau, E)
   range <- ranges[column]
 
   if (is.numeric(unlist(range))) {
@@ -50,11 +49,10 @@ sample_from_range <- function(X, row_id, available_columns, ranges) {
     right <- row_id[X[row_id, column] %in% right_range]
   }
   mia_dir <- rbinom(1, size = 1, prob = 0.5)
-  if(  mia_dir == TRUE ) {
+  if (mia_dir == TRUE) {
     # 1 is for right
     right <- c(right, which(mia))
-  }
-  else {
+  } else {
     # 0 is for left
     left <- c(left, which(mia))
   }
@@ -94,8 +92,8 @@ mondrian_find_rule <- function(X, row_id, tau = NULL, ranges, ...) {
   )
 }
 
-sampler_classifier <- function( X, row_id, ... ) {
-  table(X[row_id,"Class"])/length(row_id)
+sampler_classifier <- function(X, row_id, ...) {
+  table(X[row_id, "Class"]) / length(row_id)
 }
 
 mondrian_split <- function(X,
@@ -113,7 +111,7 @@ mondrian_split <- function(X,
   # return(rule)
   # reaching a terminal node - you run out of data, or you reach max_depth, or
   # you have a constant column
-  if (is.null(rule$column) || length(na.omit(row_id)) <= min_nodesize  ) {
+  if (is.null(rule$column) || length(na.omit(row_id)) <= min_nodesize) {
     # consider a nicer way to denote terminal nodes than just having them be a character
     return(list(
       rule = "terminal_node",
@@ -135,7 +133,7 @@ mondrian_split <- function(X,
       tau = rule$tau
     ),
     left = mondrian_split(X,
-                          row_id = rule$left_id,
+      row_id = rule$left_id,
       tau = rule$tau,
       split_finder = split_finder,
       # nodes use a simple numbering scheme - the left ones are even
@@ -148,7 +146,7 @@ mondrian_split <- function(X,
       ranges = rule$left_ranges
     ),
     right = mondrian_split(X,
-                           row_id = rule$right_id,
+      row_id = rule$right_id,
       tau = rule$tau,
       split_finder = split_finder,
       2 * node_id + 1,
@@ -211,16 +209,17 @@ mondrian_tree <- function(X, lambda = NULL, split_finder = mondrian_find_rule,
     row_id <- seq_len(nrow(X))
   }
   ranges <- compute_ranges(X[row_id, available_columns])
-  result <- list( tree = mondrian_split(X,
-                                        row_id = row_id, tau = lambda, split_finder,
-                                        available_columns = available_columns,
-                                        ranges = ranges,...)
-  )
-  maybe_oob_obs <- X[list( setdiff( seq_len(nrow(X)), row_id ),
-                           which(seq_len(nrow(X)) > max(row_id))
-  )[[chronological_errors + 1]],]
-  if( nrow(maybe_oob_obs) > 0) {
-    result <- c( oob_obs = maybe_oob_obs )
+  result <- list(tree = mondrian_split(X,
+    row_id = row_id, tau = lambda, split_finder,
+    available_columns = available_columns,
+    ranges = ranges, ...
+  ))
+  maybe_oob_obs <- X[list(
+    setdiff(seq_len(nrow(X)), row_id),
+    which(seq_len(nrow(X)) > max(row_id))
+  )[[chronological_errors + 1]], ]
+  if (nrow(maybe_oob_obs) > 0) {
+    result <- c(oob_obs = maybe_oob_obs)
   }
 
   structure(

@@ -15,11 +15,11 @@ encoder_forest <- function(X,
                            subsample_size = 2^max_depth,
                            row_id = NULL,
                            resample = ifelse(subsample_size < (nrow(X) / n_tree),
-                                             TRUE,
-                                             FALSE
+                             TRUE,
+                             FALSE
                            ),
                            ...) {
-  if( is.null(row_id) ) {
+  if (is.null(row_id)) {
     row_id <- seq_len(nrow(X))
   }
   if (resample) {
@@ -28,31 +28,38 @@ encoder_forest <- function(X,
       function(i) {
         # fit a tree on a random sample
         random_tree(X,
-        max_depth = max_depth,
-        row_id = sample(row_id, size = subsample_size ),
-        ...
+          max_depth = max_depth,
+          row_id = sample(row_id, size = subsample_size),
+          ...
         )
-      },.options = furrr::furrr_options(seed = TRUE)
+      },
+      .options = furrr::furrr_options(seed = TRUE)
     )
   } else {
-    if(is.null(subsample_size)) {
-      tree_folds <- lapply( seq_len(n_tree),
-                            function(sample){ row_id })
-    }
-    else {
+    if (is.null(subsample_size)) {
+      tree_folds <- lapply(
+        seq_len(n_tree),
+        function(sample) {
+          row_id
+        }
+      )
+    } else {
       tree_folds <- resample_folds(row_id, subsample_size)
     }
     forest <- furrr::future_map(tree_folds, function(fold) {
       # fit a tree on a predetermined fold
       random_tree(X,
-                  max_depth = max_depth,
-                  row_id = fold,
-                  ...
+        max_depth = max_depth,
+        row_id = fold,
+        ...
       )
     }, .options = furrr::furrr_options(seed = TRUE))
   }
   names(forest) <- seq_len(length(forest))
-  structure( list( forest = forest,
-                   Phi = 2^max_depth),
-             class = "encoder_forest")
+  structure(list(
+    forest = forest,
+    Phi = 2^max_depth
+  ),
+  class = "encoder_forest"
+  )
 }
