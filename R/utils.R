@@ -1,10 +1,10 @@
-resample_folds <- function( range = 10, size = 2 ) {
+resample_folds <- function( ids = seq_len(10), size = 2 ) {
 
-  full_range <- seq_len(range)
+  # full_range <- seq_len(range)
   folds <- list()
-  for( fold in seq_len(ceiling(range/size)) ) {
-    current_sample <- sample( full_range, size = size )
-    full_range <- full_range[ -c(current_sample) ]
+  for( fold in seq_len(ceiling(length(ids)/size)) ) {
+    current_sample <- sample( ids, size = size )
+    ids <- ids[ -c(current_sample) ]
     folds[[fold]] <- current_sample
   }
   return(folds)
@@ -31,4 +31,17 @@ median_sample <- function(x) {
     return( sample( x, 1 ))
   }
   return( median(x) )
+}
+
+
+get_max_depth <- function( tree, depth = 0 ) {
+  if( depth == 0 ) {
+    tree <- tree$tree
+  }
+  if( is.character(tree$rule) ) {
+    return(depth)
+  }
+  max( get_max_depth(tree$left, depth = depth + 1),
+       get_max_depth(tree$right, depth = depth + 1)
+       )
 }
