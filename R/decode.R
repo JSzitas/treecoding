@@ -47,8 +47,6 @@ decode_terminal_nodes_tree <- function(terminal_node_df, ...) {
 }
 reconcile_intervals <- function(x) {
   if (is_numeric(x[[1]])) {
-    # x <- do.call( rbind, x )
-    # return( mean(max(x[,1]), min(x[,2])) )
     return(stats::median(unlist(x)))
   }
   Reduce(intersect, x)[1]

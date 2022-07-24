@@ -28,7 +28,7 @@ return_uncertainty <- function(id) {
 }
 
 traversal_sampling_uncertain <- function(tree, X, id = seq_len(nrow(X)), predict_fun) {
-  if (length(na.omit(id)) == 0 || all(is.na(id))) {
+  if (length(stats::na.omit(id)) == 0 || all(is.na(id))) {
     return()
   }
   if (is.character(tree$rule)) {
@@ -53,9 +53,9 @@ traversal_sampling_uncertain <- function(tree, X, id = seq_len(nrow(X)), predict
 }
 #' @export
 #' @rdname prediction
-predict.uncertain_tree <- function(x, newdata, predict_fun = predictor_identity, ...) {
+predict.uncertain_tree <- function(object, newdata, predict_fun = predictor_identity, ...) {
   traversal_sampling_uncertain(
-    tree = x[["tree"]],
+    tree = object[["tree"]],
     X = newdata,
     id = seq_len(nrow(newdata)),
     predict_fun = predict_fun

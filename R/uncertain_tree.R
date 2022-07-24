@@ -143,6 +143,7 @@ split2 <- function(X,
 #' @description Fit a random tree to your data.
 #' @param X The data to use - currently only supports a matrix.
 #' @param max_depth The maximal depth of the tree (though the tree might be shorter - this is an upper bound).
+#' @param split_finder A function to find splits.
 #' @param nosplit_columns Columns to ignore when splitting - but which are nonetheless propagated to
 #' the terminal node.
 #' @param row_id A subset of rows to use for growing the tree - if **NULL**, use all rows.
@@ -152,7 +153,7 @@ split2 <- function(X,
 #' @export
 uncertain_tree <- function(X, max_depth = 5, split_finder = find_rule2,
                            nosplit_columns = NULL, row_id = NULL,
-                           chronological_errors = TRUE, ...) {
+                           chronological_oob = TRUE, ...) {
   available_columns <- colnames(X)
   if (!is.null(nosplit_columns)) {
     available_columns <- available_columns[-parse_nosplit_columns(X, nosplit_columns)]
@@ -167,10 +168,12 @@ uncertain_tree <- function(X, max_depth = 5, split_finder = find_rule2,
     available_columns = available_columns,
     ranges = ranges, ...
   ))
+
   maybe_oob_obs <- X[list(
     setdiff(seq_len(nrow(X)), row_id),
     which(seq_len(nrow(X)) > max(row_id))
-  )[[chronological_errors + 1]], ]
+  )[[chronological_oob + 1]], ]
+
   if (nrow(maybe_oob_obs) > 0) {
     result <- c(oob_obs = maybe_oob_obs)
   }

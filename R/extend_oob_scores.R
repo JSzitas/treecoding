@@ -1,4 +1,3 @@
-
 traversal_oob_extension <- function(tree, X, id = seq_len(nrow(X)), predict_fun, scoring_fun, ...) {
   if (is.character(tree$rule)) {
     if (length(id) != 0) {

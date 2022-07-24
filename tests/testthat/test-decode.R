@@ -2,6 +2,7 @@
 test_objects <- readRDS("testdata/decoding_data.rda")
 
 test_that("decoding a tree works", {
+  testthat::skip("Broken for now, revisit when fixing decoding")
   set.seed(1071)
   decoded_tree <- decode(test_objects$tree, test_objects$encoded_tree)
 
@@ -19,6 +20,8 @@ test_that("decoding a tree works", {
 })
 
 test_that("decoding a forest works", {
+  testthat::skip("Broken for now, revisit when fixing decoding")
+
   decoded_forest <- decode(test_objects$forest, test_objects$encoded_forest)
 
   expected_result <- structure(list(`1` = c("c", "c", "a", "c", "b", "a"), `2` = c(

@@ -6,14 +6,14 @@
 \alias{predict.uncertain_tree}
 \title{Predict from terminal nodes of a tree}
 \usage{
-\method{predict}{random_tree}(x, newdata, predict_fun = predictor_identity, ...)
+\method{predict}{random_tree}(object, newdata, predict_fun = predictor_identity, ...)
 
-\method{predict}{encoder_forest}(x, newdata, predict_fun = predictor_identity, ...)
+\method{predict}{encoder_forest}(object, newdata, predict_fun = predictor_identity, ...)
 
-\method{predict}{uncertain_tree}(x, newdata, predict_fun = predictor_identity, ...)
+\method{predict}{uncertain_tree}(object, newdata, predict_fun = predictor_identity, ...)
 }
 \arguments{
-\item{x}{nada}
+\item{object}{nada}
 
 \item{newdata}{yada}
 

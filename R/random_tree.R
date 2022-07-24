@@ -52,7 +52,7 @@ find_rule <- function(X, row_id, available_columns, ...) {
       right = right_rule
     )
   }
-  mia_dir <- rbinom(1, 1, 0.5)
+  mia_dir <- stats::rbinom(1, 1, 0.5)
   # either send mia observations left or right, with equal probability
   if (mia_dir == TRUE) {
     # 1 is for right
@@ -100,7 +100,7 @@ split <- function(X,
   # return(rule)
   # reaching a terminal node - you run out of data, or you reach max_depth, or
   # you have a constant column
-  if (current_depth == max_depth || length(na.omit(row_id)) <= min_nodesize || is.null(rule$rule)) {
+  if (current_depth == max_depth || length(stats::na.omit(row_id)) <= min_nodesize || is.null(rule$rule)) {
     # consider a nicer way to denote terminal nodes than just having them be a character
     return(list(
       rule = "terminal_node",
@@ -175,6 +175,7 @@ parse_nosplit_columns <- function(X, nosplit_columns) {
 #' @description Fit a random tree to your data.
 #' @param X The data to use - currently only supports a matrix.
 #' @param max_depth The maximal depth of the tree (though the tree might be shorter - this is an upper bound).
+#' @param split_finder A function to find splits.
 #' @param nosplit_columns Columns to ignore when splitting - but which are nonetheless propagated to
 #' the terminal node.
 #' @param row_id A subset of rows to use for growing the tree - if **NULL**, use all rows.

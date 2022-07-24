@@ -10,7 +10,7 @@ uncertain_tree(
   split_finder = find_rule2,
   nosplit_columns = NULL,
   row_id = NULL,
-  chronological_errors = TRUE,
+  chronological_oob = TRUE,
   ...
 )
 }
@@ -19,14 +19,16 @@ uncertain_tree(
 
 \item{max_depth}{The maximal depth of the tree (though the tree might be shorter - this is an upper bound).}
 
+\item{split_finder}{A function to find splits.}
+
 \item{nosplit_columns}{Columns to ignore when splitting - but which are nonetheless propagated to
 the terminal node.}
 
 \item{row_id}{A subset of rows to use for growing the tree - if **NULL**, use all rows.}
 
-\item{...}{Additional arguments.}
-
 \item{chronological_oob}{Use only observations which came **after** the training set for errors?}
+
+\item{...}{Additional arguments.}
 }
 \value{
 A fitted tree

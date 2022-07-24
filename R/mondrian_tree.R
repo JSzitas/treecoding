@@ -9,7 +9,7 @@ sample_from_range <- function(X, row_id, available_columns, ranges) {
   mia <- is.na(X[row_id, column])
   row_id <- row_id[!mia]
   # compute E by sampling from exponential distribution with rate sum(ranges)
-  E <- rexp(1, rate = sum(new_weights))
+  E <- stats::rexp(1, rate = sum(new_weights))
 
   if (length(row_id) == 0 || (E > tau)) {
     return(
@@ -48,7 +48,7 @@ sample_from_range <- function(X, row_id, available_columns, ranges) {
     left <- row_id[X[row_id, column] %in% left_range]
     right <- row_id[X[row_id, column] %in% right_range]
   }
-  mia_dir <- rbinom(1, size = 1, prob = 0.5)
+  mia_dir <- stats::rbinom(1, size = 1, prob = 0.5)
   if (mia_dir == TRUE) {
     # 1 is for right
     right <- c(right, which(mia))
@@ -75,9 +75,9 @@ mondrian_find_rule <- function(X, row_id, tau = NULL, ranges, ...) {
   rule <- sample_from_range(X, row_id, seq_len(length(ranges)), ranges)
   # update ranges and return
   left_ranges <- ranges
-  left_ranges[[column]] <- rule$left
+  left_ranges[[rule$column]] <- rule$left
   right_ranges <- ranges
-  right_ranges[[column]] <- rule$right
+  right_ranges[[rule$column]] <- rule$right
 
   return(
     list(
@@ -111,7 +111,7 @@ mondrian_split <- function(X,
   # return(rule)
   # reaching a terminal node - you run out of data, or you reach max_depth, or
   # you have a constant column
-  if (is.null(rule$column) || length(na.omit(row_id)) <= min_nodesize) {
+  if (is.null(rule$column) || length(stats::na.omit(row_id)) <= min_nodesize) {
     # consider a nicer way to denote terminal nodes than just having them be a character
     return(list(
       rule = "terminal_node",
@@ -190,7 +190,7 @@ ranges_to_weights <- function(ranges) {
 #' Build a mondrian tree
 #' @description Fit a random tree to your data.
 #' @param X The data to use - currently only supports a matrix.
-#' @param max_depth The maximal depth of the tree (though the tree might be shorter - this is an upper bound).
+#' @param lambda The maximal depth of the tree (though the tree might be shorter - this is an upper bound).
 #' @param nosplit_columns Columns to ignore when splitting - but which are nonetheless propagated to
 #' the terminal node.
 #' @param row_id A subset of rows to use for growing the tree - if **NULL**, use all rows.
@@ -198,9 +198,9 @@ ranges_to_weights <- function(ranges) {
 #' @param ... Additional arguments.
 #' @return A fitted tree
 #' @export
-mondrian_tree <- function(X, lambda = NULL, split_finder = mondrian_find_rule,
+mondrian_tree <- function(X, lambda = NULL,
                           nosplit_columns = NULL, row_id = NULL,
-                          chronological_errors = TRUE, ...) {
+                          chronological_oob = TRUE, ...) {
   available_columns <- colnames(X)
   if (!is.null(nosplit_columns)) {
     available_columns <- available_columns[-parse_nosplit_columns(X, nosplit_columns)]
@@ -210,14 +210,14 @@ mondrian_tree <- function(X, lambda = NULL, split_finder = mondrian_find_rule,
   }
   ranges <- compute_ranges(X[row_id, available_columns])
   result <- list(tree = mondrian_split(X,
-    row_id = row_id, tau = lambda, split_finder,
+    row_id = row_id, tau = lambda, mondrian_find_rule,
     available_columns = available_columns,
     ranges = ranges, ...
   ))
   maybe_oob_obs <- X[list(
     setdiff(seq_len(nrow(X)), row_id),
     which(seq_len(nrow(X)) > max(row_id))
-  )[[chronological_errors + 1]], ]
+  )[[chronological_oob + 1]], ]
   if (nrow(maybe_oob_obs) > 0) {
     result <- c(oob_obs = maybe_oob_obs)
   }

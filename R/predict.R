@@ -1,5 +1,5 @@
 traversal_sampling_vec <- function(tree, X, id = seq_len(nrow(X)), predict_fun) {
-  if (length(na.omit(id)) == 0 || all(is.na(id))) {
+  if (length(stats::na.omit(id)) == 0 || all(is.na(id))) {
     return()
   }
   if (is.character(tree$rule)) {
@@ -44,7 +44,7 @@ predictor_identity <- function(X, row_id, samples, ...) matrix(rep(samples, leng
 predictor_identity_simple <- function(X, row_id, samples, ...) samples
 #' Predict from terminal nodes of a tree
 #'
-#' @param x nada
+#' @param object nada
 #' @param newdata yada
 #' @param predict_fun lada
 #' @param ... prada
@@ -52,9 +52,9 @@ predictor_identity_simple <- function(X, row_id, samples, ...) samples
 #' @importFrom stats predict
 #' @export
 #' @rdname prediction
-predict.random_tree <- function(x, newdata, predict_fun = predictor_identity, ...) {
+predict.random_tree <- function(object, newdata, predict_fun = predictor_identity, ...) {
   traversal_sampling_vec(
-    tree = x[["tree"]],
+    tree = object[["tree"]],
     X = newdata,
     id = seq_len(nrow(newdata)),
     predict_fun = predict_fun
@@ -62,9 +62,9 @@ predict.random_tree <- function(x, newdata, predict_fun = predictor_identity, ..
 }
 #' @export
 #' @rdname prediction
-predict.encoder_forest <- function(x, newdata, predict_fun = predictor_identity, ...) {
+predict.encoder_forest <- function(object, newdata, predict_fun = predictor_identity, ...) {
   smpls <- purrr::imap(
-    x[["forest"]],
+    object[["forest"]],
     ~ cbind(
       tree_id = .y,
       predict(

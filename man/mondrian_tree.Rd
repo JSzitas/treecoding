@@ -7,26 +7,25 @@
 mondrian_tree(
   X,
   lambda = NULL,
-  split_finder = mondrian_find_rule,
   nosplit_columns = NULL,
   row_id = NULL,
-  chronological_errors = TRUE,
+  chronological_oob = TRUE,
   ...
 )
 }
 \arguments{
 \item{X}{The data to use - currently only supports a matrix.}
 
+\item{lambda}{The maximal depth of the tree (though the tree might be shorter - this is an upper bound).}
+
 \item{nosplit_columns}{Columns to ignore when splitting - but which are nonetheless propagated to
 the terminal node.}
 
 \item{row_id}{A subset of rows to use for growing the tree - if **NULL**, use all rows.}
 
-\item{...}{Additional arguments.}
-
-\item{max_depth}{The maximal depth of the tree (though the tree might be shorter - this is an upper bound).}
-
 \item{chronological_oob}{Use only observations which came **after** the training set for errors?}
+
+\item{...}{Additional arguments.}
 }
 \value{
 A fitted tree

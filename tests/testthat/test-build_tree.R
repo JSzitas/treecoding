@@ -11,6 +11,6 @@ test_that("Fitting a random tree works", {
   tree <- random_tree(df, max_depth = 8)
 
   expect_s3_class(tree, "random_tree")
-  expect_equal(tree[["rule"]][["column"]], 4)
-  expect_equal(tree[["rule"]][["rule"]], 0.6484567, tolerance = 0.05)
+  expect_equal(tree[["tree"]][["rule"]][["column"]], "X3")
+  expect_equal(tree[["tree"]][["rule"]][["rule"]], 0.6484567, tolerance = 0.05)
 })

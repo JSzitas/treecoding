@@ -13,7 +13,10 @@ Imports:
     furrr,
     stats,
     data.table,
-    purrr
+    purrr,
+    tidyr, 
+    dplyr,
+    rlang
 RoxygenNote: 7.1.2
 Suggests: 
     covr,
