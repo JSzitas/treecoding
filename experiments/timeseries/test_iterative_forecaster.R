@@ -2,12 +2,13 @@ source("../average_tile.R")
 predictor_ar <- function(X, row_id, leaf_node, ...) {
   samples <- leaf_node$parameter_estimates
   X <- cbind(1, X[row_id,][, c( "Holiday", "demand_lag_1", "demand_lag_2", "demand_lag_3",
-                            "demand_lag_4", "demand_lag_5", "time_index", "sin_48", "cos_48",
-                            "sin_336", "cos_336"#, "sin_1344", "cos_1344"
+                            "demand_lag_4", "demand_lag_5", "time_index"#, "sin_48", "cos_48",
+                            #"sin_336", "cos_336"#, "sin_1344", "cos_1344"
                             )])
 
   miss_cols <- which(is.na(samples))
   if (length(miss_cols) > 0) {
+    # print(miss_cols)
     return(list(predictions = matrix(as.matrix(X[, -miss_cols]) %*% samples[-miss_cols], ncol = 1)))
   }
 
@@ -72,10 +73,10 @@ iterative_forecaster_ar <- function( tree, oob_obs, predict_fun, scoring_fun, ..
                                  demand_lag_4 = curr_test[["demand_lag_3"]],
                                  demand_lag_5 = curr_test[["demand_lag_4"]],
                                  time_index = curr_test[["time_index"]] + 1,
-                                 sin_48 = oob_obs$sin_48[i],
-                                 cos_48 = oob_obs$cos_48[i],
-                                 sin_336 = oob_obs$sin_336[i],
-                                 cos_336 = oob_obs$cos_336[i],
+                                 # sin_48 = oob_obs$sin_48[i],
+                                 # cos_48 = oob_obs$cos_48[i],
+                                 # sin_336 = oob_obs$sin_336[i],
+                                 # cos_336 = oob_obs$cos_336[i],
                                  # sin_1344 = oob_obs$sin_1344[i],
                                  # cos_1344 = oob_obs$cos_1344[i],
                                  true_y = oob_obs[observation + i,"Demand"])
