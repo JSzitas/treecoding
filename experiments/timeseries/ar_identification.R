@@ -1,5 +1,5 @@
 remove(list=ls())
-pkgload::load_all()
+pkgload::load_all(recompile = FALSE)
 
 set.seed(1071)
 # estimating parameters of a 2 regime AR model - simple case where switching is
@@ -50,9 +50,9 @@ print(summary(lm(y ~ .-1, data.frame( lag_1 = dplyr::lag(y),
 
 # note that in these simple cases we can identify this with breakpoints, more
 # or less:
-# print(strucchange::breakpoints(y~dplyr::lag(y) + dplyr::lag(y,2)-1))
+print(strucchange::breakpoints(y~dplyr::lag(y) + dplyr::lag(y,2)-1))
 # even if we misspecify the constant
-# print(strucchange::breakpoints(y~dplyr::lag(y) + dplyr::lag(y,2)))
+print(strucchange::breakpoints(y~dplyr::lag(y) + dplyr::lag(y,2)))
 # not if we use just one lag
 # print(strucchange::breakpoints(y~dplyr::lag(y)))
 # but yes if we use more than necessary (probably :))

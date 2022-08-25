@@ -15,8 +15,8 @@ traversal_id_vec <- function(tree, X, id = seq_len(nrow(X))) {
   }
   # if column is of a different type - ie character
   else {
-    left_going <- id[X[, tree$rule$column][id] %in% tree$rule$rule]
-    right_going <- id[!(X[, tree$rule$column][id] %in% tree$rule$rule)]
+    left_going <- id[X[id, tree$rule$column] %in% tree$rule$rule]
+    right_going <- id[!(X[id, tree$rule$column] %in% tree$rule$rule)]
   }
   if (!as.logical(tree$rule$na_dir)) {
     left_going <- c(left_going, which(mia))
@@ -43,7 +43,7 @@ encode <- function(object, ...) {
 #' @export
 #' @rdname encoder
 encode.random_tree <- function(object, X, ...) {
-  result <- traversal_id_vec(object, X)
+  result <- traversal_id_vec(object[["tree"]], X)
   result[order(result$id), ]$node_id
 }
 #' @export

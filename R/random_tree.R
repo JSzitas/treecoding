@@ -100,7 +100,13 @@ split <- function(X,
   # return(rule)
   # reaching a terminal node - you run out of data, or you reach max_depth, or
   # you have a constant column
-  if (current_depth == max_depth || length(stats::na.omit(row_id)) <= min_nodesize || is.null(rule$rule)) {
+  if ( current_depth == max_depth ||
+       is.null(rule$rule) ||
+       length(row_id) <= min_nodesize
+       # f further splitting would create child nodes which are too small
+       # length(rule$left) <= min_nodesize ||
+       # length(rule$right) <= min_nodesize
+       ) {
     # consider a nicer way to denote terminal nodes than just having them be a character
     return(list(
       rule = "terminal_node",
@@ -108,6 +114,7 @@ split <- function(X,
       # pruning rules that have become redundant (ie for each column just
       # take the last available set of rules)
       terminal_rules = terminal_rules, # resolve_terminal_rules(terminal_rules),
+      # terminal_ranges = compute_ranges(X[row_id,]),
       node_id = node_id,
       n = length(row_id),
       parameter_estimates = parameter_sampler(X, row_id, ...)

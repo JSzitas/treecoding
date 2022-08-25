@@ -4,7 +4,7 @@ find_terminal_values <- function(tree, terminals = list(), ...) {
     # without warnings or errors - which is what we really want
     result <- as.data.frame(cbind(
       id = tree$node_id,
-      column = as.numeric(names(tree$terminal_rules)),
+      column = names(tree$terminal_rules),
       values = tree$terminal_rules
     ))
     return(result)
@@ -70,7 +70,7 @@ decode.random_tree <- function(object, terminal_ids, ...) {
   node_id <- column <- NULL
   # terminal_values <- find_terminal_values(object)
   result <- decode_terminal_nodes_tree(
-    find_terminal_values(object)
+    find_terminal_values(object[["tree"]])
   )
   # coerce terminal_ids into a data.frame for joins
   flattened_tree <- data.table::data.table(
@@ -80,7 +80,6 @@ decode.random_tree <- function(object, terminal_ids, ...) {
   # merge flattened terminal_ids with result of terminal value decoding
   result <- data.table::as.data.table(result)
   result[, node_id := as.integer(node_id)]
-  result[, column := as.integer(column)]
   result <- merge(result,
     flattened_tree,
     on = c("node_id"), allow.cartesian = TRUE
@@ -95,7 +94,11 @@ decode.random_tree <- function(object, terminal_ids, ...) {
 decode.encoder_forest <- function(object, terminal_ids, ...) {
   # appease data.table
   column <- row_id <- value <- node_id <- tree_id <- NULL
-  terminal_values <- purrr::map(object$forest, find_terminal_values, ...)
+  terminal_values <- purrr::map(object$forest,
+                                ~ find_terminal_values(.x[["tree"]],
+                                                       ...)
+  )
+  # return(terminal_values)
   # decode all terminal nodes
   result <- data.table::rbindlist(
     purrr::imap(terminal_values, function(values, index) {
@@ -105,7 +108,7 @@ decode.encoder_forest <- function(object, terminal_ids, ...) {
       )
     })
   )
-  result[, column := as.integer(unlist(column))]
+  result[, column := unlist(column)]
   result[, node_id := as.integer(unlist(node_id))]
   result[, tree_id := as.integer(tree_id)]
   # flatten forest generated ids to a table
@@ -118,7 +121,7 @@ decode.encoder_forest <- function(object, terminal_ids, ...) {
   # result <- tidyr::pivot_wider( result, names_from = "column", values_from = "value", values_fn = reconcile_intervals )
   # # result <- data.table::dcast( result, row_id ~ column, value.var = "value", fun.aggregate = reconcile_intervals)
   # return(result)
-  return(result)
+  # return(result)
 
   # reconcile and cast to wide
   result <- result[, as.character(reconcile_intervals(value)), by = list(column, row_id)]
