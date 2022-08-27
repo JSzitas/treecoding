@@ -66,13 +66,13 @@ template <typename T> struct CategoricalSet{
   };
 };
 
-template <typename NumericKind, typename CategoricKind > struct interval {
+template <typename NumericKind, typename CategoricKind > struct intervals {
   std::vector<NumericInterval<NumericKind>> NumericIntervals;
-  std::vector<CategoricalSet<CategoricKind>> CategoricalIntervals;
+  std::vector<CategoricalSet<CategoricKind>> CategoricalSets;
 
-  interval(){};
-  interval( Eigen::Matrix<NumericKind, Eigen::Dynamic, Eigen::Dynamic> num_data,
-            Eigen::Matrix<CategoricKind, Eigen::Dynamic, Eigen::Dynamic> cat_data ) {
+  intervals(){};
+  intervals( Eigen::Matrix<NumericKind, Eigen::Dynamic, Eigen::Dynamic> num_data,
+             Eigen::Matrix<CategoricKind, Eigen::Dynamic, Eigen::Dynamic> cat_data ) {
     NumericIntervals.reserve(num_data.cols());
     for(int i = 0; i < num_data.cols(); i++) {
       NumericIntervals.push_back(
@@ -81,17 +81,28 @@ template <typename NumericKind, typename CategoricKind > struct interval {
         NumericInterval<NumericKind>( min_max(num_data.col(i)), i)
       );
     }
-    CategoricalIntervals.reserve(cat_data.cols());
+    CategoricalSets.reserve(cat_data.cols());
 
     int total_num_cols = num_data.cols();
     for(int i=0; i < cat_data.cols();i++) {
-      CategoricalIntervals.push_back(
+      CategoricalSets.push_back(
         // this basically says - take the column, compute range, push that into
         // the numeric interval
         CategoricalSet<CategoricKind>( distinct(cat_data.col(i)), i+total_num_cols)
       );
     }
   }
+  // maybe an update method
+  // and a merge method (for merging multiple of these?)
 };
+
+template <typename NumericKind, typename CategoricKind> struct split {
+  union variant {
+    NumericInterval<NumericKind> range;
+    CategoricalSet<CategoricKind> set;
+  };
+  bool type = false;
+};
+
 
 #endif

@@ -11,16 +11,14 @@
 // #include "split.h"
 #include "ranges.h"
 
-typedef std::variant<std::vector<int>, float> splittype_variant;
-
 struct node {
   // maybe this can be just a std::vector<float>? where we check
   // its size and if its size is > 1 we can cast to int and solve an easier problem
   // std::vector<float> split;
   // maybe really actually use a variant ie - the visitor might not be so bad
-  splittype_variant range;
+  split<float, int> range;
   bool terminal = false;
-  interval<float, std::vector<int>> terminal_range;
+  intervals<float, int> terminal_range;
   int node_size;
   node *left;
   node *right;
@@ -42,6 +40,9 @@ class Tree {
       max_depth = max_depth;
       min_nodesize = min_nodesize;
     };
+    void grow(){
+
+    };
     // growing a tree
     // void grow_tree();
     // creating predictions
@@ -52,5 +53,7 @@ class Tree {
     TreeDataStorage data;
     node tree;
 };
+
+
 
 #endif

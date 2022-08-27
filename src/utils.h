@@ -33,11 +33,11 @@ template <class T, typename U = int> std::vector<U> distinct( T a ) {
   // using std::set
   std::unordered_set<U> uniques;
   int current_size = 0;
-  for( auto item : a ) {
-    uniques.insert(item);
+  for( int i=0; i< a.size(); i++) {
+    uniques.insert(a[i]);
     if( uniques.size() > current_size ) {
       current_size++;
-      result.push_back(item);
+      result.push_back(a[i]);
     }
   }
   return result;

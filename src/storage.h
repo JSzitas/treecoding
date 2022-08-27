@@ -2,9 +2,6 @@
 #define STORAGE_HEADER
 
 #include "Eigen/Dense"
-// #include <optional>
-#include <variant>
-#include <vector>
 #include "typedefs.h"
 
 class TreeDataStorage{

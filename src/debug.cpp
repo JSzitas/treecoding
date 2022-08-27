@@ -8,6 +8,10 @@ using namespace Rcpp;
 #include <RcppEigen.h>
 using Eigen::VectorXf;
 using Eigen::MatrixXf;
+#include "ranges.h"
+#include <iostream>
+#include "stdio.h"
+
 
 // [[Rcpp::plugins("cpp17")]]
 
@@ -25,6 +29,19 @@ std::vector<int> debug4( Eigen::MatrixXi X, int col, std::vector<int> matches ) 
   return result.left;
 }
 
+// [[Rcpp::export]]
+int debug5( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
+
+  auto res = intervals<float, int>( X, Y );
+  for( int i=0; i< res.NumericIntervals.size(); i++ ) {
+    res.NumericIntervals[i].print();
+  }
+  for( int i=0; i< res.CategoricalSets.size(); i++ ) {
+    res.CategoricalSets[i].print();
+  }
+
+  return 0;
+}
 
 
 
