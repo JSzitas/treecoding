@@ -1,12 +1,12 @@
 #ifndef TREE_HEADER
 #define TREE_HEADER
 
-#include <functional>
-#include <optional>
-#include <variant>
-#include <vector>
-#include "Eigen/Dense"
-#include "utils.h"
+// #include <functional>
+// #include <optional>
+// #include <variant>
+// #include <vector>
+// #include "Eigen/Dense"
+// #include "utils.h"
 #include "storage.h"
 // #include "split.h"
 #include "ranges.h"
@@ -26,22 +26,40 @@ struct node {
 
 class Tree {
   public:
-    // intializer
-    void initTree( TreeDataStorage data,
-                   int max_depth,
-                   int min_nodesize
-                   // spltter will be a callable
-                   // optional extratree k
-                   // std::optional<int> k,
-                   // optional extratree mtry
-                   // std::optional<int> mtry
-                   ) {
+    Tree() {
+      data = TreeDataStorage();
+      max_depth = 8;
+      min_nodesize = 30;
+    };
+    Tree( TreeDataStorage data,
+          int max_depth = 8,
+          int min_nodesize = 30 ) {
       data = data;
       max_depth = max_depth;
       min_nodesize = min_nodesize;
     };
+    Tree( Eigen::MatrixXf num_data,
+          Eigen::MatrixXi cat_data,
+          target_variant target = {},
+          int max_depth = 8,
+          int min_nodesize = 30) {
+      data = TreeDataStorage(num_data,cat_data, target);
+      max_depth = max_depth;
+      min_nodesize = min_nodesize;
+    };
     void grow(){
-
+      // First we take the data and generate a candidate split - 
+      // for now we will only use random trees, we can try to extend this 
+      // later
+      for(int i=0; i < data.cols(); i++) {
+        // after you select a column, compute a range and fill it in our 
+        // current node
+        tree.range = split<float, int>();
+      }
+      
+      
+      
+      
     };
     // growing a tree
     // void grow_tree();

@@ -3,11 +3,12 @@ using namespace Rcpp;
 #include "sampling.h"
 // #include "tree_header.h"
 #include "utils.h"
-#include <variant>
+// #include <variant>
 #include "Eigen/Dense"
 #include <RcppEigen.h>
 using Eigen::VectorXf;
 using Eigen::MatrixXf;
+#include "storage.h"
 #include "ranges.h"
 #include <iostream>
 #include "stdio.h"
@@ -42,6 +43,23 @@ int debug5( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
 
   return 0;
 }
+
+// [[Rcpp::export]]
+int debug6( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
+  
+  TreeDataStorage tree_data(X, Y);
+  
+  // auto res = intervals<float, int>( X, Y );
+  // for( int i=0; i< res.NumericIntervals.size(); i++ ) {
+  //   res.NumericIntervals[i].print();
+  // }
+  // for( int i=0; i< res.CategoricalSets.size(); i++ ) {
+  //   res.CategoricalSets[i].print();
+  // }
+  
+  return 0;
+}
+
 
 
 

@@ -9,10 +9,10 @@
 #include "tree.h"
 
 // template <typename Splitter> void grow( Tree *tree, Splitter splitter ) {
-//
-//
-//
-//
+// 
+// 
+// 
+// 
 // }
 
 // void split( node *current_node,

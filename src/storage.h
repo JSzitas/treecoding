@@ -6,6 +6,15 @@
 
 class TreeDataStorage{
   public:
+    TreeDataStorage() {
+      target = {};
+      ncol = 0;
+      nrow = 0;
+      num_cols = 0;
+      cat_cols = 0;
+      num_data_mat = Eigen::Matrix<float, 1, 1>(1);
+      cat_data_mat = Eigen::Matrix<int, 1, 1>(1);
+    };
     //constructor
     TreeDataStorage( Eigen::MatrixXf num_data,
                      Eigen::MatrixXi cat_data,
