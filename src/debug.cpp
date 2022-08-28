@@ -60,7 +60,21 @@ int debug6( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
   return 0;
 }
 
-
+int debug7(int cols) {
+  int x = sample_int_from_set(sequence(0, cols, 1));
+  
+  template <typename T> int sample_int_from_set( T set, rng & generator ) {
+    return (int)(generator.yield() * set.size());
+  }
+  
+  int sample_int_from_set( int first, int last, rng & generator ) {
+    return (int)((generator.yield() * (float)(last - first)) + (float)first);
+  }
+  
+  int sample_int_from_set( int last, rng & generator ) {
+    return (int)(generator.yield() * (float)(last));
+  }
+}
 
 
 // RCPP_EXPOSED_CLASS(Tree);

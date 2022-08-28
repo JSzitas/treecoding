@@ -2,6 +2,7 @@
 #define UTIL_HEADER
 
 #include <vector>
+#include "rng.h"
 
 template <class T> auto min_elem( T &a) {
   auto result = a[0];
@@ -211,6 +212,18 @@ template <class VectorIndex > auto split_vector_indices( disjunct_indices<Vector
   result.right = result_right;
 
   return result;
+}
+
+template <typename T> int sample_int_from_set( T set, rng & generator ) {
+  return (int)(generator.yield() * set.size());
+}
+
+int sample_int_from_set( int first, int last, rng & generator ) {
+  return (int)((generator.yield() * (float)(last - first)) + (float)first);
+}
+
+int sample_int_from_set( int last, rng & generator ) {
+  return (int)(generator.yield() * (float)(last));
 }
 
 #endif
