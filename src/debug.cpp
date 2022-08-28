@@ -46,9 +46,9 @@ int debug5( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
 
 // [[Rcpp::export]]
 int debug6( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
-  
+
   TreeDataStorage tree_data(X, Y);
-  
+
   // auto res = intervals<float, int>( X, Y );
   // for( int i=0; i< res.NumericIntervals.size(); i++ ) {
   //   res.NumericIntervals[i].print();
@@ -56,11 +56,29 @@ int debug6( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
   // for( int i=0; i< res.CategoricalSets.size(); i++ ) {
   //   res.CategoricalSets[i].print();
   // }
-  
+
   return 0;
 }
 
+// [[Rcpp::export]]
+void swapper( float x, float y ) {
+  // std::cout << "x is: " << x << " and y is: " << y << "\n";
+  swap<float>(x,y);
+  // std::cout << "now x is: " << x << " and y is: " << y;
+}
 
+// [[Rcpp::export]]
+void bad_swapper( float x, float y ) {
+  // std::cout << "x is: " << x << " and y is: " << y << "\n";
+  bad_swap<float>(x,y);
+  // std::cout << "now x is: " << x << " and y is: " << y;
+}
+// [[Rcpp::export]]
+void evil_swapper( float x, float y ) {
+  std::cout << "x is: " << x << " and y is: " << y << "\n";
+  evil_swap<float>(&x,&y);
+  std::cout << "now x is: " << x << " and y is: " << y;
+}
 
 
 // RCPP_EXPOSED_CLASS(Tree);
