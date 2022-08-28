@@ -7,22 +7,22 @@
 #include <set>
 #include "utils.h"
 
-std::vector<int> sample_indices( const int n,
-                                 const int size)
-{
-  std::vector<int> result(n);
-  for(int i=0; i<n;i++) {
-    result[i] = i;
-  }
-  std::mt19937 generator(std::random_device{}());
-
-  std::shuffle( result.begin(),
-                result.end(),
-                generator);
-  result.resize(size);
-
-  return result;
-}
+// std::vector<int> sample_indices( const int n,
+//                                  const int size)
+// {
+//   std::vector<int> result(n);
+//   for(int i=0; i<n;i++) {
+//     result[i] = i;
+//   }
+//   std::mt19937 generator(std::random_device{}());
+//
+//   std::shuffle( result.begin(),
+//                 result.end(),
+//                 generator);
+//   result.resize(size);
+//
+//   return result;
+// }
 
 // template <class T, typename U = int> T distinct( T a ) {
 //   T result;
@@ -76,22 +76,15 @@ template <class T> T reshuffle( T &a) {
   std::shuffle(a.begin(), a.end(), generator);
 }
 
+// template <> shuffler( T& a, &generator ) {
+//
+// }
+
+
 template <typename T> void swap(T &a, T &b) {
   a = a+b;
   b = a-b;
   a = a-b;
-}
-
-template <typename T> void bad_swap(T a, T b) {
-  a = a+b;
-  b = a-b;
-  a = a-b;
-}
-
-template <typename T> void evil_swap(T *a, T *b) {
-  *a = *(a)+*(b);
-  *b = *(a)-*(b);
-  *a = *(a)-*(b);
 }
 
 #endif

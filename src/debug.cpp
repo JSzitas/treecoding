@@ -67,19 +67,6 @@ void swapper( float x, float y ) {
   // std::cout << "now x is: " << x << " and y is: " << y;
 }
 
-// [[Rcpp::export]]
-void bad_swapper( float x, float y ) {
-  // std::cout << "x is: " << x << " and y is: " << y << "\n";
-  bad_swap<float>(x,y);
-  // std::cout << "now x is: " << x << " and y is: " << y;
-}
-// [[Rcpp::export]]
-void evil_swapper( float x, float y ) {
-  std::cout << "x is: " << x << " and y is: " << y << "\n";
-  evil_swap<float>(&x,&y);
-  std::cout << "now x is: " << x << " and y is: " << y;
-}
-
 
 // RCPP_EXPOSED_CLASS(Tree);
 //

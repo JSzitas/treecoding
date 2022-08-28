@@ -93,6 +93,12 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
     }
   }
   // maybe an update method
+  void add(NumericInterval<NumericKind> x) {
+    NumericIntervals.push_back(x);
+  };
+  void add(CategoricalSet<CategoricKind> x) {
+    CategoricalSets.push_back(x);
+  };
   // and a merge method (for merging multiple of these?)
 };
 
@@ -103,6 +109,11 @@ template <typename NumericKind, typename CategoricKind> struct split {
   };
   bool type = false;
 };
+
+template <typename T, typename U> split< T,U > make_split() {
+
+}
+
 
 
 #endif
