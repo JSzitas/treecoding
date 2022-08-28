@@ -76,4 +76,22 @@ template <class T> T reshuffle( T &a) {
   std::shuffle(a.begin(), a.end(), generator);
 }
 
+template <typename T> void swap(T &a, T &b) {
+  a = a+b;
+  b = a-b;
+  a = a-b;
+}
+
+template <typename T> void bad_swap(T a, T b) {
+  a = a+b;
+  b = a-b;
+  a = a-b;
+}
+
+template <typename T> void evil_swap(T *a, T *b) {
+  *a = *(a)+*(b);
+  *b = *(a)-*(b);
+  *a = *(a)-*(b);
+}
+
 #endif
