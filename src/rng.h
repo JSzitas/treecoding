@@ -8,7 +8,14 @@ uint64_t bitwise_rotate(uint64_t x, int bits, int rotate_bits) {
   return (x << rotate_bits) | (x >> (bits - rotate_bits));
 }
 
-struct halton_generator {
+// this exists to be inherited from ;)
+struct rng{
+  float yield(){ return 1;};
+  void set(){ return;}
+  void reset(){return;}
+};
+
+struct halton_generator : rng {
   float yield(){
     x = d-n;
     if(x == 1){
@@ -43,7 +50,7 @@ struct halton_generator {
 };
 
 
-struct reccurent_generator {
+struct reccurent_generator : rng {
   float yield() {
     z = (z+alpha);
     // a slightly evil way to do z % 1 with floats
@@ -71,7 +78,7 @@ struct reccurent_generator {
   //   }
 };
 
-struct splitmix_generator {
+struct splitmix_generator : rng {
   float yield() {
     uint64_t result = (s += 0x9E3779B97f4A7C15);
     result = (result ^ (result >> 30)) * 0xBF58476D1CE4E5B9;
@@ -91,7 +98,7 @@ struct splitmix_generator {
     uint64_t s = 12374563468;
 };
 
-struct xoshiro_generator {
+struct xoshiro_generator : rng {
   float yield(){
     uint64_t const result = s[0] + s[3];
     uint64_t const t = s[1] << 17;
@@ -139,7 +146,7 @@ struct xoshiro_generator {
     uint64_t s[4];
 };
 
-struct xorshift_generator {
+struct xorshift_generator : rng {
   float yield() {
     uint64_t t = x[0];
     uint64_t const s = x[1];
@@ -167,6 +174,5 @@ struct xorshift_generator {
   private:
     uint64_t x[2];
 };
-
 
 #endif
