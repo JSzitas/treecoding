@@ -3,6 +3,8 @@
 
 #include <vector>
 #include "rng.h"
+// #include <iostream>
+// #include "stdio.h"
 
 template <class T> auto min_elem( T &a) {
   auto result = a[0];
@@ -214,16 +216,21 @@ template <class VectorIndex > auto split_vector_indices( disjunct_indices<Vector
   return result;
 }
 
-template <typename T> int sample_int_from_set( T set, rng & generator ) {
-  return (int)(generator.yield() * set.size());
+template <typename T, class U> int sample_int_from_set( T set, U & generator ) {
+  return (int)(generator.yield() * (float)set.size());
 }
 
-int sample_int_from_set( int first, int last, rng & generator ) {
+template <class U> int sample_int_from_set( int first, int last, U & generator ) {
   return (int)((generator.yield() * (float)(last - first)) + (float)first);
 }
 
-int sample_int_from_set( int last, rng & generator ) {
+template <class U> int sample_int_from_set( int last, U & generator ) {
   return (int)(generator.yield() * (float)(last));
 }
+
+template <typename R, class U> R sample_from_range( R last, U & generator ) {
+  return (R)(generator.yield() * (float)(last));
+}
+
 
 #endif

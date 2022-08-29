@@ -2,14 +2,34 @@
 #define RANGE_HEADER
 
 #include <vector>
-#include <optional>
+// #include <optional>
 #include "Eigen/Dense"
 
-#include <iostream>
-#include <stdio.h>
+// #include <iostream>
+// #include <stdio.h>
 #include "utils.h"
 
+// what if this is rather a tagged union, or maybe an Eigen::MatrixXf which is
+// handled according to a flag?
+#include <variant>
+
+typedef std::variant<Eigen::VectorXf,
+                     Eigen::VectorXi,
+                     Eigen::MatrixXf,
+                     Eigen::MatrixXi,
+                     std::monostate> target_variant;
+
 template <typename T> struct NumericRange{
+  NumericRange(){};
+  NumericRange(T a, T b){
+    lower = a;
+    upper = b;
+  };
+  NumericRange(std::vector<T> a) {
+    NumericRange<T> rng = min_max(a);
+    upper = rng.upper;
+    lower = rng.lower;
+  }
   T upper, lower;
 };
 
@@ -92,6 +112,10 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
       );
     }
   }
+  void reserve(int num_size, int cat_size) {
+    NumericIntervals.reserve(num_size);
+    CategoricalSets.reserve(cat_size);
+  };
   // maybe an update method
   void add(NumericInterval<NumericKind> x) {
     NumericIntervals.push_back(x);
@@ -102,7 +126,7 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
   // and a merge method (for merging multiple of these?)
 };
 
-template <typename NumericKind, typename CategoricKind> struct split {
+template <typename NumericKind, typename CategoricKind> struct node_split {
   union variant {
     NumericInterval<NumericKind> range;
     CategoricalSet<CategoricKind> set;
@@ -110,9 +134,45 @@ template <typename NumericKind, typename CategoricKind> struct split {
   bool type = false;
 };
 
-template <typename T, typename U> split< T,U > make_split() {
-
+template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
+  return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
 }
+
+template <typename T> void swap(T &a, T &b) {
+  a = a+b;
+  b = a-b;
+  a = a-b;
+}
+
+template <class T, class U> void shuffle( T &a, U & generator ) {
+  int b;
+  for( int i=0; i< a.size(); i++ ) {
+      // find something to swap with
+      b = sample_int_from_set( a, generator );
+      // call swap
+      swap(a[i], b);
+  }
+}
+
+
+template <typename T, class U> CategoricalSet<T> sample( CategoricalSet<T> x, U & generator) {
+  CategoricalSet<T> result;
+  auto cutoff = (T)generator.yield();
+  result.reserve(cutoff);
+
+  // for( int=0; i<cutoff; i++ ) {
+  //
+  // }
+
+
+
+  return result;
+}
+
+
+// template <typename T, typename U> split< T,U > make_split() {
+//
+// }
 
 
 

@@ -1,5 +1,5 @@
-#ifndef QUASIRANDOM_RNG
-#define QUASIRANDOM_RNG
+#ifndef RNG
+#define RNG
 
 #include <stdint.h>
 #define MAX_SIZE_64_BIT_UINT (18446744073709551615U)
@@ -8,14 +8,14 @@ uint64_t bitwise_rotate(uint64_t x, int bits, int rotate_bits) {
   return (x << rotate_bits) | (x >> (bits - rotate_bits));
 }
 
-// this exists to be inherited from ;)
-struct rng{
-  float yield(){ return 1;};
-  void set(){ return;}
-  void reset(){return;}
-};
-
-struct halton_generator : rng {
+struct halton {
+  halton(){
+    base=2;
+    y = 1;
+    n=0;
+    d=1;
+    x = 1;
+  };
   float yield(){
     x = d-n;
     if(x == 1){
@@ -46,11 +46,15 @@ struct halton_generator : rng {
     x = 1;
   };
   private:
-    float base=2, y = 1, n=0, d=1, x = 1;
+    float base, y, n, d, x;
 };
 
 
-struct reccurent_generator : rng {
+struct recurrent {
+  recurrent(){
+    seed = 0.5;
+    alpha = 0.618034;
+  };
   float yield() {
     z = (z+alpha);
     // a slightly evil way to do z % 1 with floats
@@ -78,7 +82,10 @@ struct reccurent_generator : rng {
   //   }
 };
 
-struct splitmix_generator : rng {
+struct splitmix {
+  splitmix(){
+    s = 12374563468;
+  };
   float yield() {
     uint64_t result = (s += 0x9E3779B97f4A7C15);
     result = (result ^ (result >> 30)) * 0xBF58476D1CE4E5B9;
@@ -95,10 +102,18 @@ struct splitmix_generator : rng {
     s = x;
   };
   private:
-    uint64_t s = 12374563468;
+    uint64_t s;
 };
 
-struct xoshiro_generator : rng {
+struct xoshiro {
+  xoshiro(){
+    splitmix gn;
+    s[0] = gn.yield_init();
+    s[1] = s[0] >> 32;
+
+    s[2] = gn.yield();
+    s[3] = s[2] >> 32;
+  };
   float yield(){
     uint64_t const result = s[0] + s[3];
     uint64_t const t = s[1] << 17;
@@ -113,16 +128,8 @@ struct xoshiro_generator : rng {
 
     return (float)result/(float)MAX_SIZE_64_BIT_UINT;
   }
-  void init() {
-    splitmix_generator gn;
-    s[0] = gn.yield_init();
-    s[1] = s[0] >> 32;
-
-    s[2] = gn.yield();
-    s[3] = s[2] >> 32;
-  };
   void reset(){
-    splitmix_generator gn;
+    splitmix gn;
     s[0] = gn.yield_init();
     s[1] = s[0] >> 32;
 
@@ -146,7 +153,12 @@ struct xoshiro_generator : rng {
     uint64_t s[4];
 };
 
-struct xorshift_generator : rng {
+struct xorshift {
+  xorshift() {
+    splitmix gn;
+    x[0] = gn.yield_init();
+    x[1] = x[0] >> 32;
+  };
   float yield() {
     uint64_t t = x[0];
     uint64_t const s = x[1];
@@ -157,13 +169,8 @@ struct xorshift_generator : rng {
     x[1] = t;
     return (float)(t + s)/(float)MAX_SIZE_64_BIT_UINT;
   };
-  void init() {
-    splitmix_generator gn;
-    x[0] = gn.yield_init();
-    x[1] = x[0] >> 32;
-  };
   void reset(){
-    splitmix_generator gn;
+    splitmix gn;
     x[0] = gn.yield_init();
     x[1] = x[0] >> 32;
   };

@@ -76,15 +76,4 @@ template <class T> T reshuffle( T &a) {
   std::shuffle(a.begin(), a.end(), generator);
 }
 
-// template <> shuffler( T& a, &generator ) {
-//
-// }
-
-
-template <typename T> void swap(T &a, T &b) {
-  a = a+b;
-  b = a-b;
-  a = a-b;
-}
-
 #endif

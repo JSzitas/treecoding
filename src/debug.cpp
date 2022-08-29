@@ -8,7 +8,6 @@ using namespace Rcpp;
 #include <RcppEigen.h>
 using Eigen::VectorXf;
 using Eigen::MatrixXf;
-#include "storage.h"
 #include "ranges.h"
 #include <iostream>
 #include "stdio.h"
@@ -44,28 +43,62 @@ int debug5( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
   return 0;
 }
 
+
 // [[Rcpp::export]]
-int debug6( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
+std::vector<int> smpl( int size ) {
+  recurrent gen;
 
-  TreeDataStorage tree_data(X, Y);
+  std::vector<int> result;
+  result.reserve(size);
+  for( int i=0; i< size;i++) {
+    result.push_back(sample_int_from_set( sequence<int>(0, 15, 1), gen));
+  }
+  return result;
+}
 
-  // auto res = intervals<float, int>( X, Y );
-  // for( int i=0; i< res.NumericIntervals.size(); i++ ) {
-  //   res.NumericIntervals[i].print();
-  // }
-  // for( int i=0; i< res.CategoricalSets.size(); i++ ) {
-  //   res.CategoricalSets[i].print();
-  // }
 
-  return 0;
+// [[Rcpp::export]]
+std::vector<float> sample_debug( float a = 0.3, float b = 2.8, int size = 100 ) {
+  recurrent gen;
+  auto range = NumericRange(a, b);
+
+  std::vector<float> result;
+  result.reserve(size);
+  for( int i= 0; i< size; i++) {
+    result.push_back(sample(range,gen));
+  }
+
+  return result;
 }
 
 // [[Rcpp::export]]
-void swapper( float x, float y ) {
-  // std::cout << "x is: " << x << " and y is: " << y << "\n";
-  swap<float>(x,y);
-  // std::cout << "now x is: " << x << " and y is: " << y;
+void shuffler( int size = 15 ) {
+  recurrent gen;
+
+  auto seq = sequence(0, size, 1);
+  for( auto &item:seq ) {
+    std::cout << item << "";
+  }
+  std::cout << "\n";
+  shuffle( seq, gen );
+
+  for( auto &item:seq ) {
+    std::cout << item;
+  }
+  std::cout << "\n";
+
+
+  // auto range = NumericRange(a, b);
+
+  // std::vector<float> result;
+  // result.reserve(size);
+  // for( int i= 0; i< size; i++) {
+    // result.push_back(sample(range,gen));
+  // }
+
+  // return result;
 }
+
 
 
 // RCPP_EXPOSED_CLASS(Tree);
