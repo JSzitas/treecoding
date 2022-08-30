@@ -2,11 +2,7 @@
 #define RANGE_HEADER
 
 #include <vector>
-// #include <optional>
 #include "Eigen/Dense"
-
-// #include <iostream>
-// #include <stdio.h>
 #include "utils.h"
 
 // what if this is rather a tagged union, or maybe an Eigen::MatrixXf which is
@@ -84,6 +80,18 @@ template <typename T> struct CategoricalSet{
     }
     std::cout << "\n";
   };
+  int size(){
+    return set_vals.size();
+  }; 
+  T operator[] (int i) {
+    return set_vals[i];
+  };
+  void push_back(int x) {
+    set_vals.push_back(x);
+  };
+  void reserve(int x) {
+    set_vals.reserve(x);
+  }
 };
 
 template <typename NumericKind, typename CategoricKind > struct intervals {
@@ -127,10 +135,12 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
 };
 
 template <typename NumericKind, typename CategoricKind> struct node_split {
-  union variant {
-    NumericInterval<NumericKind> range;
-    CategoricalSet<CategoricKind> set;
+  node_split<NumericKind,CategoricKind> (){
+    range = NumericInterval<NumericKind>();
+    type = true;
   };
+  NumericInterval<NumericKind> range;
+  CategoricalSet<CategoricKind> set;
   bool type = false;
 };
 
@@ -144,7 +154,7 @@ template <typename T> void swap(T &a, T &b) {
   a = a-b;
 }
 
-template <class T, class U> void shuffle( T &a, U & generator ) {
+template <class T, class U> void shuffle( T &a, U &generator ) {
   int b;
   for( int i=0; i< a.size(); i++ ) {
       // find something to swap with
@@ -154,26 +164,39 @@ template <class T, class U> void shuffle( T &a, U & generator ) {
   }
 }
 
+template <typename CategoricKind> struct CategoricalSplit {
+  CategoricalSet<CategoricKind> left;
+  CategoricalSet<CategoricKind> right;
+  void print() {
+    std::cout << "Categorical Split with elements left and right: \n";
+    std::cout << "Left: \n";
+    left.print();
+    std::cout << "Right: \n";
+    std::cout << "\n";
+    right.print();
+  }
+};
 
-template <typename T, class U> CategoricalSet<T> sample( CategoricalSet<T> x, U & generator) {
-  CategoricalSet<T> result;
-  auto cutoff = (T)generator.yield();
-  result.reserve(cutoff);
+template <typename T, class U> CategoricalSplit<T> sample( CategoricalSet<T> x, U & generator) {
 
-  // for( int=0; i<cutoff; i++ ) {
-  //
-  // }
-
-
+  CategoricalSplit<T> result;
+  result.left.reserve(x.size());
+  result.right.reserve(x.size());
+  
+  // for( auto &item: x ) {
+  // rewrite categorical set to work with iterators  
+  for( int i=0; i< x.size(); i++){  
+    if( generator.yield() > 0.5) {
+      result.left.push_back(x[i]);
+      result.left.col_id = x.col_id;
+    }
+    else {
+      result.right.push_back(x[i]);
+      result.right.col_id = x.col_id;
+    }
+  }
 
   return result;
 }
-
-
-// template <typename T, typename U> split< T,U > make_split() {
-//
-// }
-
-
 
 #endif

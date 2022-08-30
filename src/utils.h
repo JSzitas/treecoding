@@ -216,8 +216,27 @@ template <class VectorIndex > auto split_vector_indices( disjunct_indices<Vector
   return result;
 }
 
-template <typename T, class U> int sample_int_from_set( T set, U & generator ) {
-  return (int)(generator.yield() * (float)set.size());
+template <typename T> bool is_same( T &a, T &b, float tol = 0.000001 ) {
+  return (float)(a - b) < tol;
+}
+// I think this should be, in theory, slower than e.g. an unordered map search 
+// expect for cases where we are searching over small data... which is what 
+// I anticipate we will be doing. Hopefully you can return to this later and
+// check this assummption
+template <class T> bool all_const( T &a ) {
+  auto comp = a[0];
+  for( auto &item : a) {
+    if( !is_same(item, comp) ) {
+      return false;
+    }
+    comp = item;
+  }
+  return true;
+}
+
+
+template <class T, class U> int sample_int_from_set( T set, U & generator ) {
+  return set[ (int)(generator.yield() * (float)set.size())];
 }
 
 template <class U> int sample_int_from_set( int first, int last, U & generator ) {

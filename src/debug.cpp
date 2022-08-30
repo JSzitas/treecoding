@@ -1,9 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 #include "sampling.h"
-// #include "tree_header.h"
 #include "utils.h"
-// #include <variant>
 #include "Eigen/Dense"
 #include <RcppEigen.h>
 using Eigen::VectorXf;
@@ -11,7 +9,7 @@ using Eigen::MatrixXf;
 #include "ranges.h"
 #include <iostream>
 #include "stdio.h"
-
+#include "tree.h"
 
 // [[Rcpp::plugins("cpp17")]]
 
@@ -46,7 +44,8 @@ int debug5( Eigen::MatrixXf X, Eigen::MatrixXi Y ) {
 
 // [[Rcpp::export]]
 std::vector<int> smpl( int size ) {
-  recurrent gen;
+  // recurrent gen;
+  splitmix gen;
 
   std::vector<int> result;
   result.reserve(size);
@@ -86,18 +85,27 @@ void shuffler( int size = 15 ) {
     std::cout << item;
   }
   std::cout << "\n";
-
-
-  // auto range = NumericRange(a, b);
-
-  // std::vector<float> result;
-  // result.reserve(size);
-  // for( int i= 0; i< size; i++) {
-    // result.push_back(sample(range,gen));
-  // }
-
-  // return result;
 }
+// [[Rcpp::export]]
+void test_categorical_sampling( std::vector<int> x ) {
+  recurrent gen;
+  
+  CategoricalSet<int> myset(x, 0);
+  
+  auto res = sample(myset, gen);
+  res.print();
+}
+
+// [[Rcpp::export]]
+bool const_checker( std::vector<int> x ) {
+  return all_const(x);
+}
+
+
+// void debug_tree(Eigen::MatrixXf Xf, Eigen::MatrixXi Xc, target_variant y = {}) {
+//   Tree debug_tree(Xf, Xc, y);
+//   
+// }
 
 
 

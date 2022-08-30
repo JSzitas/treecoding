@@ -2,7 +2,7 @@
 #include "ranges.h"
 
 struct Splitter {
-  virtual node_split<float, int> split(){};
+  virtual node_split<float, int> split(){ return node_split<float,int>();  };
 };
 
 struct NumericSplit : Splitter {
