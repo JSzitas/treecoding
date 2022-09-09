@@ -56,6 +56,15 @@ template <typename T> std::vector<T> sequence( const T from, const T to, const T
   return result;
 }
 
+std::vector<int> sequence( const int size ) {
+  std::vector<int> result( size );
+  result[0] = 0;
+  for( int i = 1; i < size; i++) {
+    result[i] = result[i-1] + 1;
+  }
+  return result;
+}
+
 template < class T, typename U > std::vector<bool> smaller_than( T x, U val ) {
   std::vector<bool> result;
   result.reserve(x.size());
@@ -224,12 +233,12 @@ template <typename T> bool is_same( T &a, T &b, float tol = 0.000001 ) {
 // I anticipate we will be doing. Hopefully you can return to this later and
 // check this assummption
 template <class T> bool all_const( T &a ) {
-  auto comp = a[0];
+  // auto comp = a[0];
   for( auto &item : a) {
-    if( !is_same(item, comp) ) {
+    if( !is_same(item, a[0]) ) {
       return false;
     }
-    comp = item;
+    // comp = item;
   }
   return true;
 }
@@ -251,5 +260,21 @@ template <typename R, class U> R sample_from_range( R last, U & generator ) {
   return (R)(generator.yield() * (float)(last));
 }
 
+template <typename T> void swap(T &a, T &b) {
+  a = a+b;
+  b = a-b;
+  a = a-b;
+}
+
+template <class T, class U> void shuffle( T &a, U &generator ) {
+  int j;
+  auto seq = sequence(a.size());
+  for( int i=0; i< a.size(); i++ ) {
+    // find something to swap with
+    j = sample_int_from_set( seq, generator );
+    // call swap
+    swap(a[i], a[j]);
+  }
+}
 
 #endif

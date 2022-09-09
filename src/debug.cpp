@@ -97,10 +97,31 @@ void test_categorical_sampling( std::vector<int> x ) {
 }
 
 // [[Rcpp::export]]
-bool const_checker( std::vector<int> x ) {
+bool const_checker( std::vector<int> &x ) {
   return all_const(x);
 }
 
+// [[Rcpp::export]]
+int add_one(int x) {
+  return x + 1;
+}
+
+
+// [[Rcpp::export]]
+std::vector<int> sample_rows_cpp( std::vector<int> x, int size, bool repl = false ) {
+  
+  recurrent gen;
+  auto result = sample_rows(x, size, gen, repl);
+  return result;
+}
+
+// [[Rcpp::export]]
+std::vector<int> sample_rows_cpp2( std::vector<int> x, int size, bool repl = false ) {
+  
+  recurrent gen;
+  auto result = sample_rows2(x, size, gen, repl);
+  return result;
+}
 
 // void debug_tree(Eigen::MatrixXf Xf, Eigen::MatrixXi Xc, target_variant y = {}) {
 //   Tree debug_tree(Xf, Xc, y);

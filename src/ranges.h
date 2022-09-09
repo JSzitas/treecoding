@@ -148,22 +148,6 @@ template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
   return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
 }
 
-template <typename T> void swap(T &a, T &b) {
-  a = a+b;
-  b = a-b;
-  a = a-b;
-}
-
-template <class T, class U> void shuffle( T &a, U &generator ) {
-  int b;
-  for( int i=0; i< a.size(); i++ ) {
-      // find something to swap with
-      b = sample_int_from_set( a, generator );
-      // call swap
-      swap(a[i], b);
-  }
-}
-
 template <typename CategoricKind> struct CategoricalSplit {
   CategoricalSet<CategoricKind> left;
   CategoricalSet<CategoricKind> right;

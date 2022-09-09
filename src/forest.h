@@ -11,7 +11,13 @@ template <class RngGenerator> class Forest {
     
   };
   ~Forest(){};
-  void grow(){};
+  void grow(){
+    for(int i=0; i<num_trees, i++) {
+      rows = sample_rows( data, sample_rate);
+      // Tree( num_data, cat_data );
+    }    
+    
+  };
   void print(){};
   
   

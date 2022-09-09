@@ -15,14 +15,102 @@
 //     result[i] = i;
 //   }
 //   std::mt19937 generator(std::random_device{}());
-//
+// 
 //   std::shuffle( result.begin(),
 //                 result.end(),
 //                 generator);
 //   result.resize(size);
-//
+// 
 //   return result;
 // }
+
+template <class T, class Rng> T sample_rows( T x,
+                                             const int size,
+                                             Rng & generator,
+                                             const bool replace = false)
+{
+  T result;
+  result.reserve(size);
+  if( replace ) {
+    result.reserve(size);
+    for(int i=0; i < size; i++) {
+      result.push_back( sample_int_from_set(x, generator));
+    }
+  }
+  // TODO: shuffling is way too slow, figure out how to make a nicer generator
+  else {
+    shuffle(x, generator);
+    x.resize(size);
+    x = result;
+  }
+  
+  return result;
+}
+
+template <class T, class Rng> T sample_rows2( T x,
+                                             const int size,
+                                             Rng & generator,
+                                             const bool replace = false)
+{
+  if( size == x.size()) {
+    return x;
+  }
+  T result;
+  result.reserve(size);
+  if( replace ) {
+    result.reserve(size);
+    for(int i=0; i < size; i++) {
+      result.push_back( sample_int_from_set(x, generator));
+    }
+  }
+  // TODO: shuffling is way too slow, figure out how to make a nicer generator
+  else {
+    std::unordered_set<int> hash_map;
+    hash_map.reserve(size);
+    int current_size = 0;
+    while(true){
+      auto item = sample_int_from_set(x, generator);
+      if( !hash_map.count(item)) {
+        result.push_back(item);
+        current_size++;
+      }
+      hash_map.insert(item);
+      if( current_size == size) {
+        break;
+      }
+    }
+  }
+  return result;
+}
+
+
+// template <class T, class Rng> T sample_rows3( T x,
+//                                               const int size,
+//                                               Rng & generator,
+//                                               const bool replace = false)
+// {
+//   T result;
+//   result.reserve(size);
+//   if( replace ) {
+//     result.reserve(size);
+//     for(int i=0; i < size; i++) {
+//       result.push_back( sample_int_from_set(x, generator));
+//     }
+//   }
+//   // TODO: shuffling is way too slow, figure out how to make a nicer generator
+//   else {
+//     for( int i = 0; i < size; i++) {
+//       int j = (int)(x.size() * generator.yield());
+//       
+//       result.push_back(j);
+//     }
+//     generator.yield();
+//   }
+//   
+//   return result;
+// }
+
+
 
 // template <class T, typename U = int> T distinct( T a ) {
 //   T result;
@@ -71,9 +159,9 @@ std::vector<int> sample_from_categoric_kinds( const std::vector<int> &a ) {
   return result;
 }
 
-template <class T> T reshuffle( T &a) {
-  std::mt19937 generator(std::random_device{}());
-  std::shuffle(a.begin(), a.end(), generator);
-}
+// template <class T> T reshuffle( T &a) {
+//   std::mt19937 generator(std::random_device{}());
+//   std::shuffle(a.begin(), a.end(), generator);
+// }
 
 #endif
