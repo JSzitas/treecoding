@@ -5,16 +5,6 @@
 #include "Eigen/Dense"
 #include "utils.h"
 
-// what if this is rather a tagged union, or maybe an Eigen::MatrixXf which is
-// handled according to a flag?
-#include <variant>
-
-typedef std::variant<Eigen::VectorXf,
-                     Eigen::VectorXi,
-                     Eigen::MatrixXf,
-                     Eigen::MatrixXi,
-                     std::monostate> target_variant;
-
 template <typename T> struct NumericRange{
   NumericRange(){};
   NumericRange(T a, T b){
@@ -60,6 +50,12 @@ template <typename T> struct NumericInterval{
     upper_val = range.upper;
     col_id = col;
   };
+  NumericInterval( std::vector<T> vec, int col ){
+    auto range = min_max(vec);
+    lower_val = range.lower;
+    upper_val = range.upper;
+    col_id = col;
+  };
   void print() {
     std::cout << "Column: " << col_id << " with range " << lower_val << " to " << upper_val << "\n";
   };
@@ -71,7 +67,7 @@ template <typename T> struct CategoricalSet{
   CategoricalSet(){};
   CategoricalSet(std::vector<T> set, int col) {
     col_id = col;
-    set_vals = set;
+    set_vals = distinct(set);
   };
   void print() {
     std::cout << "Column: " << col_id << " with items: ";
@@ -82,7 +78,7 @@ template <typename T> struct CategoricalSet{
   };
   int size(){
     return set_vals.size();
-  }; 
+  };
   T operator[] (int i) {
     return set_vals[i];
   };
@@ -135,15 +131,14 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
 };
 
 template <typename NumericKind, typename CategoricKind> struct node_split {
-  node_split<NumericKind,CategoricKind> (){
-    range = NumericInterval<NumericKind>();
-    type = true;
-  };
+  // node_split<NumericKind,CategoricKind> (){
+  //   range = NumericInterval<NumericKind>();
+  //   type = true;
+  // };
   NumericInterval<NumericKind> range;
   CategoricalSet<CategoricKind> set;
   bool type = false;
 };
-
 template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
   return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
 }
@@ -166,10 +161,9 @@ template <typename T, class U> CategoricalSplit<T> sample( CategoricalSet<T> x, 
   CategoricalSplit<T> result;
   result.left.reserve(x.size());
   result.right.reserve(x.size());
-  
-  // for( auto &item: x ) {
-  // rewrite categorical set to work with iterators  
-  for( int i=0; i< x.size(); i++){  
+
+  // rewrite categorical set to work with iterators
+  for( int i=0; i< x.size(); i++){
     if( generator.yield() > 0.5) {
       result.left.push_back(x[i]);
       result.left.col_id = x.col_id;

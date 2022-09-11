@@ -23,10 +23,6 @@ struct CategoricSplit : Splitter {
     node_split<float, int> result;
 
     // X.col(col)
-
-
-
-
     return result;
   }
 };

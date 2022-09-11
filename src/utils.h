@@ -228,17 +228,39 @@ template <class VectorIndex > auto split_vector_indices( disjunct_indices<Vector
 template <typename T> bool is_same( T &a, T &b, float tol = 0.000001 ) {
   return (float)(a - b) < tol;
 }
-// I think this should be, in theory, slower than e.g. an unordered map search 
-// expect for cases where we are searching over small data... which is what 
+
+template <class Container, typename Element> bool belongs( Container x, Element y ) {
+  for( int i=0; i< x.size(); i++ ) {
+    if( is_same( x[i], y)) {
+      return true;
+    }
+  }
+  return false;
+}
+// finds item in first which are not in second >> S(A) - S(B)
+template < class T, typename U = int > T set_diff( const T x, const T y ) {
+  std::unordered_set<U> myset(y.begin(),y.end());
+  T result;
+  // avoid resizing
+  result.reserve(x.size());
+  for( auto &item : x ) {
+    if( !myset.count(item) ) {
+      result.push_back(item);
+    }
+  }
+  return result;
+}
+
+
+// I think this should be, in theory, slower than e.g. an unordered map search
+// expect for cases where we are searching over small data... which is what
 // I anticipate we will be doing. Hopefully you can return to this later and
 // check this assummption
-template <class T> bool all_const( T &a ) {
-  // auto comp = a[0];
-  for( auto &item : a) {
-    if( !is_same(item, a[0]) ) {
+template <class T> bool all_const( T a ) {
+  for( int i=1; i < a.size(); i++) {
+    if( !is_same(a[i], a[0]) ) {
       return false;
     }
-    // comp = item;
   }
   return true;
 }

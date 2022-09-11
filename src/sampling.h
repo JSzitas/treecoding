@@ -2,27 +2,10 @@
 #define SAMPLING_HEADER
 
 #include <vector>
-#include <random>
-#include <algorithm>
+// #include <random>
+// #include <algorithm>
 #include <set>
 #include "utils.h"
-
-// std::vector<int> sample_indices( const int n,
-//                                  const int size)
-// {
-//   std::vector<int> result(n);
-//   for(int i=0; i<n;i++) {
-//     result[i] = i;
-//   }
-//   std::mt19937 generator(std::random_device{}());
-// 
-//   std::shuffle( result.begin(),
-//                 result.end(),
-//                 generator);
-//   result.resize(size);
-// 
-//   return result;
-// }
 
 template <class T, class Rng> T sample_rows( T x,
                                              const int size,
@@ -43,7 +26,7 @@ template <class T, class Rng> T sample_rows( T x,
     x.resize(size);
     x = result;
   }
-  
+
   return result;
 }
 
@@ -101,12 +84,12 @@ template <class T, class Rng> T sample_rows2( T x,
 //   else {
 //     for( int i = 0; i < size; i++) {
 //       int j = (int)(x.size() * generator.yield());
-//       
+//
 //       result.push_back(j);
 //     }
 //     generator.yield();
 //   }
-//   
+//
 //   return result;
 // }
 
@@ -132,36 +115,31 @@ template <class T, class Rng> T sample_rows2( T x,
 //   return result;
 // }
 
-float sample_from_numeric_kinds( const std::vector<float> & a ) {
-  auto min_a = min_elem(a);
-  auto max_a = max_elem(a);
-  std::mt19937 generator(std::random_device{}());
-  std::uniform_real_distribution<float> distr(min_a, max_a);
-  auto sample = distr(generator);
-  return sample;
-}
-
-std::vector<int> sample_from_categoric_kinds( const std::vector<int> &a ) {
-  // find distinct elements of a in any order
-  auto set = distinct<std::vector<int>>(a);
-  // generate a random split of distinct elements
-  std::mt19937 generator(std::random_device{}());
-  std::uniform_int_distribution<> distr(0, int(set.size()-1));
-  int sample = distr(generator);
-
-  std::vector<int> result;
-  result.reserve(sample + 1);
-
-  for( int i=0; i <= sample; i++ ) {
-      result.push_back(set[i]);
-  }
-
-  return result;
-}
-
-// template <class T> T reshuffle( T &a) {
+// float sample_from_numeric_kinds( const std::vector<float> & a ) {
+//   auto min_a = min_elem(a);
+//   auto max_a = max_elem(a);
 //   std::mt19937 generator(std::random_device{}());
-//   std::shuffle(a.begin(), a.end(), generator);
+//   std::uniform_real_distribution<float> distr(min_a, max_a);
+//   auto sample = distr(generator);
+//   return sample;
+// }
+//
+// std::vector<int> sample_from_categoric_kinds( const std::vector<int> &a ) {
+//   // find distinct elements of a in any order
+//   auto set = distinct<std::vector<int>>(a);
+//   // generate a random split of distinct elements
+//   std::mt19937 generator(std::random_device{}());
+//   std::uniform_int_distribution<> distr(0, int(set.size()-1));
+//   int sample = distr(generator);
+//
+//   std::vector<int> result;
+//   result.reserve(sample + 1);
+//
+//   for( int i=0; i <= sample; i++ ) {
+//       result.push_back(set[i]);
+//   }
+//
+//   return result;
 // }
 
 #endif
