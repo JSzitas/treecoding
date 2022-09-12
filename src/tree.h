@@ -136,7 +136,7 @@ class Tree {
       std::cout << "Growing." << "\n";
       grow( tree, sequence(0, (int)(X.rows()), 1), {}, 0 );
     };
-    void print_summary() {
+    void summary() {
       std::cout << "Max depth: " << tree_max_depth << "\n" ;
       std::cout << "Min nodesize: " << tree_min_nodesize << "\n";
       if( num_cols.size() > 0 ) {
