@@ -12,13 +12,26 @@
 // typedef std::variant<Eigen::MatrixXf, Eigen::MatrixXi> col_variant;
 
 struct node {
+  node(){};
   node_split<float, int> range;
   bool terminal = false;
   intervals<float, int> terminal_range;
   int current_depth = 0;
   int node_size;
-  node *left, *right;
+  // node *left, *right;
+  std::vector<node> children;
 };
+
+// void grab_nodes( node *tree, std::set<node*> *gathered_nodes) {
+//   if(tree->terminal == false) {
+//     return;
+//   }
+//   gathered_nodes->insert(tree);
+//
+//   grab_nodes(tree->left, gathered_nodes);
+//   grab_nodes(tree->right, gathered_nodes);
+// }
+
 
 // node* newNode(int data)
 // {
@@ -49,7 +62,7 @@ class Tree {
       X = data;
       cols = X.cols();
       // allocate first tree node
-      node *tree = new node;
+      // node *tree = new node;
       for( int i=0; i< cols; i++ ) {
         if( !all_const( X.col(i) )) {
           nonconst_cols.push_back(i);
@@ -57,7 +70,7 @@ class Tree {
       }
       num_cols = numeric_cols;
     };
-    void grow( node * tree,
+    void grow( node &tree,
                std::vector<int> row_ids,
                intervals<float, int> ranges = {},
                int current_depth = 0){
@@ -65,10 +78,11 @@ class Tree {
       // termination_label:
       // termination
       if( row_ids.size() <= tree_min_nodesize || current_depth >= tree_max_depth || nonconst_cols.size() < 1) {
-        // std::cout << "Terminal conditions met." << std::endl;
-        tree->terminal_range = ranges;
-        tree->node_size = row_ids.size();
-        tree->terminal = true;
+        std::cout << "Terminal conditions met: ";
+        std::cout << "Depth: " << current_depth << " Nodesize: " << row_ids.size() << std::endl;
+        tree.terminal_range = ranges;
+        tree.node_size = row_ids.size();
+        tree.terminal = true;
         return;
       }
       // First we take the data and generate a candidate split -
@@ -89,7 +103,7 @@ class Tree {
       //
       //   goto termination_label;
       // }
-      std::cout << current_depth << "\n";
+      // std::cout << current_depth << "\n";
       //
       // node_split<float, int> node_vals;
 
@@ -104,17 +118,18 @@ class Tree {
       // determine where row ids go
 
       // allocate child nodes
-      tree->left = new node;
-      tree->right = new node;
+      // tree->left = new node;
+      // tree->right = new node;
+      tree.children = std::vector<node>(2);
       // update ranges
 
       // recursive calls to the left and right
-      grow(tree->left, row_ids, ranges, current_depth+1);
-      grow(tree->right, row_ids, ranges, current_depth+1);
+      grow(tree.children[0], row_ids, ranges, current_depth+1);
+      grow(tree.children[1], row_ids, ranges, current_depth+1);
     };
     void fit() {
       std::cout << "Growing." << "\n";
-      grow( &tree, sequence(0, (int)(X.rows()), 1), {}, 0 );
+      grow( tree, sequence(0, (int)(X.rows()), 1), {}, 0 );
     };
     void print_summary() {
       std::cout << "Max depth: " << tree_max_depth << "\n" ;

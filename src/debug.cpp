@@ -50,7 +50,7 @@ void debug_tree(Eigen::MatrixXf Xf, std::vector<int> num_cols,
   // rec.yield();
   // Tree<recurrent> tree;
   Tree<recurrent> tree(Xf, num_cols, rec, max_depth, min_nodesz);
-  // tree.print_summary();
+  tree.print_summary();
   tree.fit();
 }
 
