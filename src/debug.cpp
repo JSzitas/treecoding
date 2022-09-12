@@ -37,12 +37,7 @@ std::vector<int> test_set_diff( std::vector<int> x, std::vector<int> y) {
 }
 
 
-// void test_intervals( Eigen::MatrixXf X ) {
-//
-// }
-
 // [[Rcpp::export]]
-
 void debug_tree(Eigen::MatrixXf Xf, std::vector<int> num_cols,
                 int max_depth = 5,
                 int min_nodesz = 30) {

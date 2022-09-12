@@ -73,7 +73,8 @@ class Tree {
     void grow( node &tree,
                std::vector<int> row_ids,
                intervals<float, int> ranges = {},
-               int current_depth = 0){
+               int current_depth = 0,
+               int tree_arity = 2){
       // the goto tag for when we found nothing to split on or a constant column
       // termination_label:
       // termination
@@ -120,12 +121,16 @@ class Tree {
       // allocate child nodes
       // tree->left = new node;
       // tree->right = new node;
-      tree.children = std::vector<node>(2);
+      tree.children = std::vector<node>(tree_arity);
+      for( int i = 0; i < tree_arity; i++) {
+        // recursive calls for constructing children
+        grow(tree.children[i], row_ids, ranges, current_depth+1);
+      }
       // update ranges
 
       // recursive calls to the left and right
-      grow(tree.children[0], row_ids, ranges, current_depth+1);
-      grow(tree.children[1], row_ids, ranges, current_depth+1);
+      // grow(tree.children[0], row_ids, ranges, current_depth+1);
+      // grow(tree.children[1], row_ids, ranges, current_depth+1);
     };
     void fit() {
       std::cout << "Growing." << "\n";
