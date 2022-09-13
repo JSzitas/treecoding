@@ -18,28 +18,9 @@ struct node {
   intervals<float, int> terminal_range;
   int current_depth = 0;
   int node_size;
-  // node *left, *right;
   std::vector<node> children;
 };
 
-// void grab_nodes( node *tree, std::set<node*> *gathered_nodes) {
-//   if(tree->terminal == false) {
-//     return;
-//   }
-//   gathered_nodes->insert(tree);
-//
-//   grab_nodes(tree->left, gathered_nodes);
-//   grab_nodes(tree->right, gathered_nodes);
-// }
-
-
-// node* newNode(int data)
-// {
-//   node* temp = new node;
-//   temp->data = data;
-//   temp->left = temp->right = NULL;
-//   return temp;
-// }
 
 template <typename T, typename U> struct Splitter{
   node_split<T,U> operator () () {
@@ -83,7 +64,7 @@ class Tree {
         std::cout << "Depth: " << current_depth << " Nodesize: " << row_ids.size() << std::endl;
         tree.terminal_range = ranges;
         tree.node_size = row_ids.size();
-        tree.terminal = true;
+        // tree.terminal = true;
         return;
       }
       // First we take the data and generate a candidate split -
