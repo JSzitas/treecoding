@@ -11,86 +11,63 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// debug3
-std::vector<int> debug3(Eigen::MatrixXf X, int col, float comp);
-RcppExport SEXP _treecoding_debug3(SEXP XSEXP, SEXP colSEXP, SEXP compSEXP) {
+// sample_rows_cpp
+std::vector<int> sample_rows_cpp(std::vector<int> x, int size, bool repl);
+RcppExport SEXP _treecoding_sample_rows_cpp(SEXP xSEXP, SEXP sizeSEXP, SEXP replSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::MatrixXf >::type X(XSEXP);
-    Rcpp::traits::input_parameter< int >::type col(colSEXP);
-    Rcpp::traits::input_parameter< float >::type comp(compSEXP);
-    rcpp_result_gen = Rcpp::wrap(debug3(X, col, comp));
-    return rcpp_result_gen;
-END_RCPP
-}
-// debug4
-std::vector<int> debug4(Eigen::MatrixXi X, int col, std::vector<int> matches);
-RcppExport SEXP _treecoding_debug4(SEXP XSEXP, SEXP colSEXP, SEXP matchesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::MatrixXi >::type X(XSEXP);
-    Rcpp::traits::input_parameter< int >::type col(colSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type matches(matchesSEXP);
-    rcpp_result_gen = Rcpp::wrap(debug4(X, col, matches));
-    return rcpp_result_gen;
-END_RCPP
-}
-// debug5
-int debug5(Eigen::MatrixXf X, Eigen::MatrixXi Y);
-RcppExport SEXP _treecoding_debug5(SEXP XSEXP, SEXP YSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::MatrixXf >::type X(XSEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXi >::type Y(YSEXP);
-    rcpp_result_gen = Rcpp::wrap(debug5(X, Y));
-    return rcpp_result_gen;
-END_RCPP
-}
-// smpl
-std::vector<int> smpl(int size);
-RcppExport SEXP _treecoding_smpl(SEXP sizeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<int> >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(smpl(size));
+    Rcpp::traits::input_parameter< bool >::type repl(replSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_rows_cpp(x, size, repl));
     return rcpp_result_gen;
 END_RCPP
 }
-// sample_debug
-std::vector<float> sample_debug(float a, float b, int size);
-RcppExport SEXP _treecoding_sample_debug(SEXP aSEXP, SEXP bSEXP, SEXP sizeSEXP) {
+// sample_rows_cpp2
+std::vector<int> sample_rows_cpp2(std::vector<int> x, int size, bool repl);
+RcppExport SEXP _treecoding_sample_rows_cpp2(SEXP xSEXP, SEXP sizeSEXP, SEXP replSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< float >::type a(aSEXP);
-    Rcpp::traits::input_parameter< float >::type b(bSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_debug(a, b, size));
+    Rcpp::traits::input_parameter< bool >::type repl(replSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_rows_cpp2(x, size, repl));
     return rcpp_result_gen;
 END_RCPP
 }
-// shuffler
-void shuffler(int size);
-RcppExport SEXP _treecoding_shuffler(SEXP sizeSEXP) {
+// test_set_diff
+std::vector<int> test_set_diff(std::vector<int> x, std::vector<int> y);
+RcppExport SEXP _treecoding_test_set_diff(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<int> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(test_set_diff(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// debug_tree
+void debug_tree(Eigen::MatrixXf Xf, std::vector<int> num_cols, int max_depth, int min_nodesz);
+RcppExport SEXP _treecoding_debug_tree(SEXP XfSEXP, SEXP num_colsSEXP, SEXP max_depthSEXP, SEXP min_nodeszSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
-    shuffler(size);
+    Rcpp::traits::input_parameter< Eigen::MatrixXf >::type Xf(XfSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type num_cols(num_colsSEXP);
+    Rcpp::traits::input_parameter< int >::type max_depth(max_depthSEXP);
+    Rcpp::traits::input_parameter< int >::type min_nodesz(min_nodeszSEXP);
+    debug_tree(Xf, num_cols, max_depth, min_nodesz);
     return R_NilValue;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_treecoding_debug3", (DL_FUNC) &_treecoding_debug3, 3},
-    {"_treecoding_debug4", (DL_FUNC) &_treecoding_debug4, 3},
-    {"_treecoding_debug5", (DL_FUNC) &_treecoding_debug5, 2},
-    {"_treecoding_smpl", (DL_FUNC) &_treecoding_smpl, 1},
-    {"_treecoding_sample_debug", (DL_FUNC) &_treecoding_sample_debug, 3},
-    {"_treecoding_shuffler", (DL_FUNC) &_treecoding_shuffler, 1},
+    {"_treecoding_sample_rows_cpp", (DL_FUNC) &_treecoding_sample_rows_cpp, 3},
+    {"_treecoding_sample_rows_cpp2", (DL_FUNC) &_treecoding_sample_rows_cpp2, 3},
+    {"_treecoding_test_set_diff", (DL_FUNC) &_treecoding_test_set_diff, 2},
+    {"_treecoding_debug_tree", (DL_FUNC) &_treecoding_debug_tree, 4},
     {NULL, NULL, 0}
 };
 

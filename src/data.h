@@ -1,6 +1,8 @@
 #ifndef MATRIX_HEADER
 #define MATRIX_HEADER
 
+#include "vector"
+
 template <typename T> struct split_result {
   split_result<T>() {
     std::vector<T> left(0);
@@ -55,8 +57,22 @@ template <typename NumericKind, typename CategoricKind> class Matrix {
       ncol++;
       cat_cols++;
     }
-    split_result<int> match( std::vector<CategoricKind> set, int col, std::vector<int> subset ) {
-
+    split_result<int> match( std::unordered_set<CategoricKind> set, int col, std::vector<int> subset ) {
+      split_result<int> result;
+      if( col < num_cols ) {
+        return result;
+      }
+      result.left.reserve(subset.size());
+      result.right.reserve(subset.size());
+      for( auto &index:subset ) {
+        if( set.count(cat_data[col][index]) ) {
+          result.left.push_back(index);
+        }
+        else {
+          result.right.push_back(index);
+        }
+      }
+      return result;
     }
     split_result<int> seq( NumericKind x, int col, std::vector<int> subset ) {
       split_result<int> result;
@@ -68,10 +84,10 @@ template <typename NumericKind, typename CategoricKind> class Matrix {
 
       for( auto &index:subset ) {
         if(num_data[col][index] <= x) {
-          result.left.push_back(num_data[col][index]);
+          result.left.push_back(index);
         }
         else {
-          result.right.push_back(num_data[col][index]);
+          result.right.push_back(index);
         }
       }
       return result;
@@ -86,10 +102,10 @@ template <typename NumericKind, typename CategoricKind> class Matrix {
 
       for( auto &index:subset ) {
         if(num_data[col][index] >= x) {
-          result.left.push_back(num_data[col][index]);
+          result.left.push_back(index);
         }
         else {
-          result.right.push_back(num_data[col][index]);
+          result.right.push_back(index);
         }
       }
       return result;

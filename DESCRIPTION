@@ -17,7 +17,8 @@ Imports:
     tidyr,
     dplyr,
     rlang,
-    Rcpp
+    Rcpp,
+    RcppEigen
 RoxygenNote: 7.1.2
 Suggests: 
     covr,

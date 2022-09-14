@@ -16,7 +16,6 @@ greedy_boostless_machine <- function(X,
   train_id <- sample(nrow(X), nrow(X) * (1-held_out))
   train <- X[ train_id,]
   test <- X[ -train_id,]
-  tictoc::tic("Fitting forest: ")
   forest <- encoder_forest(train,
     max_depth = max_depth,
     n_tree = n_tree,
@@ -28,12 +27,10 @@ greedy_boostless_machine <- function(X,
     target_name = target,
     ...
   )
-  tictoc::toc()
-  tictoc::tic("Predictions: ")
+
   preds <- predict(forest, test, predictor_mean)
   preds <- dplyr::mutate(preds, tree_id = as.numeric(.data$tree_id))
-  tictoc::toc()
-  tictoc::tic("Pivot: ")
+
   preds_wide <- tidyr::pivot_wider(preds,
     id_cols = "id",
     names_from = "tree_id",
@@ -45,9 +42,7 @@ greedy_boostless_machine <- function(X,
     dplyr::across(.fns = ~ as.numeric(unlist(.x)))
   )
   preds_wide <- dplyr::arrange(preds_wide, .data$id)
-  tictoc::toc()
 
-  tictoc::tic("Stacking:")
   stack_weights <- greedy_stacking(
     y = test[, target],
     Z = as.matrix(dplyr::select(
@@ -56,7 +51,6 @@ greedy_boostless_machine <- function(X,
     )),
     max_iter = stacking_iter
   )
-  tictoc::toc()
 
   return( structure( list( forest = forest,
                            weights = stack_weights ),
