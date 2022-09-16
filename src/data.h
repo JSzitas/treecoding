@@ -3,6 +3,8 @@
 
 #include "vector"
 
+namespace storage {
+
 template <typename T> struct split_result {
   split_result<T>() {
     std::vector<T> left(0);
@@ -12,37 +14,44 @@ template <typename T> struct split_result {
   std::vector<T> right;
 };
 
-template <typename NumericKind, typename CategoricKind> class Matrix {
+template <typename NumericKind, typename CategoricKind> class DataFrame {
   public:
-    Matrix() {
-      num_data = std::vector<NumericKind>(0);
-      cat_data = std::vector<CategoricKind>(0);
+    DataFrame<NumericKind, CategoricKind>() {
+      num_data = std::vector<std::vector<NumericKind>>(0);
+      cat_data = std::vector<std::vector<CategoricKind>>(0);
       num_cols = 0;
       cat_cols=0;
       initialized = false;
     };
-    // add constructors from eigen matrices
-    void init( std::vector<NumericKind> x ) {
-      if(initialized) {
-        return;
-      }
-      num_data.push_back(x);
-      ncol++;
-      nrow = x.size();
-      num_cols++;
+    
+    // add constructor from Rcpp DataFrame and maybe 
+    // from std::vectors (ie only moves)
+    // void init( std::vector<NumericKind> x ) {
+    //   if(initialized) {
+    //     return;
+    //   }
+    //   num_data.push_back(x);
+    //   ncol++;
+    //   nrow = x.size();
+    //   num_cols++;
+    // }
+    // void init( std::vector<CategoricKind> x ) {
+    //   if(initialized) {
+    //     return;
+    //   }
+    //   cat_data.push_back(x);
+    //   ncol++;
+    //   nrow = x.size();
+    //   cat_cols++;
+    // };
+    int cols() {
+      return ncol;
     }
-    void init( std::vector<CategoricKind> x ) {
-      if(initialized) {
-        return;
-      }
-      cat_data.push_back(x);
-      ncol++;
-      nrow = x.size();
-      cat_cols++;
+    int rows() {
+      return nrow;
     }
     void add( std::vector<NumericKind> x ) {
       if( x.size() > nrow || x.size() < nrow ) {
-        std::cout << "Attemp to add a column with differing number of rows: failed" << std::endl;
         return;
       }
       num_data.push_back(x);
@@ -51,7 +60,7 @@ template <typename NumericKind, typename CategoricKind> class Matrix {
     }
     void add( std::vector<CategoricKind> x ) {
       if( x.size() > nrow || x.size() < nrow ) {
-        std::cout << "Attemp to add a column with differing number of rows: failed" << std::endl;
+        return;
       }
       cat_data.push_back(x);
       ncol++;
@@ -111,13 +120,14 @@ template <typename NumericKind, typename CategoricKind> class Matrix {
       return result;
     }
 private:
-  std::vector<NumericKind> num_data;
-  std::vector<CategoricKind> cat_data;
+  std::vector<std::vector<NumericKind>> num_data;
+  std::vector<std::vector<CategoricKind>> cat_data;
   bool initialized;
   int nrow;
   int ncol;
   int num_cols;
   int cat_cols;
 };
+}
 
 #endif

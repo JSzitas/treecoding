@@ -1,15 +1,13 @@
 #ifndef TREE_HEADER
 #define TREE_HEADER
 
-// #include <functional>
 #include <variant>
 #include <vector>
-// #include "Eigen/Dense"
 #include "utils.h"
 #include "ranges.h"
 #include "iostream"
 #include "stdio.h"
-// typedef std::variant<Eigen::MatrixXf, Eigen::MatrixXi> col_variant;
+#include "data.h"
 
 struct node {
   node(){};
@@ -21,7 +19,6 @@ struct node {
   std::vector<node> children;
 };
 
-
 template <typename T, typename U> struct Splitter{
   node_split<T,U> operator () () {
 
@@ -32,7 +29,8 @@ template <typename T, typename U> struct Splitter{
 template <class RngGenerator>
 class Tree {
   public:
-    Tree<RngGenerator>( Eigen::MatrixXf data,
+    Tree<RngGenerator>( 
+          Matrix<float, int> data,
           std::vector<int> numeric_cols,
           RngGenerator & generator,
           int max_depth = 8,
@@ -44,11 +42,11 @@ class Tree {
       cols = X.cols();
       // allocate first tree node
       // node *tree = new node;
-      for( int i=0; i< cols; i++ ) {
-        if( !all_const( X.col(i) )) {
-          nonconst_cols.push_back(i);
-        }
-      }
+      // for( int i=0; i< cols; i++ ) {
+      //   if( !all_const( X.col(i) )) {
+      //     nonconst_cols.push_back(i);
+      //   }
+      // }
       num_cols = numeric_cols;
     };
     void grow( node &tree,
@@ -60,8 +58,8 @@ class Tree {
       // termination_label:
       // termination
       if( row_ids.size() <= tree_min_nodesize || current_depth >= tree_max_depth || nonconst_cols.size() < 1) {
-        std::cout << "Terminal conditions met: ";
-        std::cout << "Depth: " << current_depth << " Nodesize: " << row_ids.size() << std::endl;
+        // std::cout << "Terminal conditions met: ";
+        // std::cout << "Depth: " << current_depth << " Nodesize: " << row_ids.size() << std::endl;
         tree.terminal_range = ranges;
         tree.node_size = row_ids.size();
         // tree.terminal = true;
@@ -114,33 +112,33 @@ class Tree {
       // grow(tree.children[1], row_ids, ranges, current_depth+1);
     };
     void fit() {
-      std::cout << "Growing." << "\n";
+      // std::cout << "Growing." << "\n";
       grow( tree, sequence(0, (int)(X.rows()), 1), {}, 0 );
     };
-    void summary() {
-      std::cout << "Max depth: " << tree_max_depth << "\n" ;
-      std::cout << "Min nodesize: " << tree_min_nodesize << "\n";
-      if( num_cols.size() > 0 ) {
-        std::cout << "Numeric columns: " << "\n";
-        for( auto & item : num_cols ) {
-          std::cout << item << " ";
-        }
-        std::cout << "\n";
-      }
-      if( nonconst_cols.size() > 0 ) {
-        std::cout << "Nonconst cols: " << "\n";
-        for( auto & item : nonconst_cols) {
-          std::cout << item << " ";
-        }
-      }
-    };
+    // void summary() {
+    //   std::cout << "Max depth: " << tree_max_depth << "\n" ;
+    //   std::cout << "Min nodesize: " << tree_min_nodesize << "\n";
+    //   if( num_cols.size() > 0 ) {
+    //     std::cout << "Numeric columns: " << "\n";
+    //     for( auto & item : num_cols ) {
+    //       std::cout << item << " ";
+    //     }
+    //     std::cout << "\n";
+    //   }
+    //   if( nonconst_cols.size() > 0 ) {
+    //     std::cout << "Nonconst cols: " << "\n";
+    //     for( auto & item : nonconst_cols) {
+    //       std::cout << item << " ";
+    //     }
+    //   }
+    // };
     // creating predictions
     // void predict();
   private:
     std::vector<int> num_cols;
     int tree_max_depth;
     int tree_min_nodesize;
-    Eigen::MatrixXf X;
+    Matrix<float, int> X;
     node tree;
     int cols;
     std::vector<int> nonconst_cols;

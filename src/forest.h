@@ -26,8 +26,6 @@ template <class RngGenerator> class Forest {
     int num_trees;
     std::vector<Tree<RngGenerator>> trees;
     RngGenerator generator;
-    Eigen::MatrixXf num_data;
-    Eigen::MatrixXi col_data;
 };
 
 #endif

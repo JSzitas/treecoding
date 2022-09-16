@@ -5,15 +5,11 @@ sample_rows_cpp <- function(x, size, repl = FALSE) {
     .Call('_treecoding_sample_rows_cpp', PACKAGE = 'treecoding', x, size, repl)
 }
 
-sample_rows_cpp2 <- function(x, size, repl = FALSE) {
-    .Call('_treecoding_sample_rows_cpp2', PACKAGE = 'treecoding', x, size, repl)
-}
-
 test_set_diff <- function(x, y) {
     .Call('_treecoding_test_set_diff', PACKAGE = 'treecoding', x, y)
 }
 
-debug_tree <- function(Xf, num_cols, max_depth = 5L, min_nodesz = 30L) {
-    invisible(.Call('_treecoding_debug_tree', PACKAGE = 'treecoding', Xf, num_cols, max_depth, min_nodesz))
+load_data <- function(x) {
+    invisible(.Call('_treecoding_load_data', PACKAGE = 'treecoding', x))
 }
 

@@ -3,8 +3,6 @@
 
 #include <vector>
 #include "rng.h"
-// #include <iostream>
-// #include "stdio.h"
 
 template <class T> auto min_elem( T &a) {
   auto result = a[0];

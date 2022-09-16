@@ -20,12 +20,12 @@ struct halton {
     x = d-n;
     if(x == 1){
       n = 1;
-      d = d * base;
+      d *= base;
     }
     else {
       y = d;
       while(x <= y) {
-        y = y / base;
+        y /= base;
         n = (base + 1) * y - x;
       }
     }
@@ -55,18 +55,18 @@ struct recurrent {
     seed = 0.5;
     alpha = 0.618034;
     z = alpha + seed;
-    z = z - (float)(int)(z);
+    z -= (float)(int)(z);
   };
   recurrent( float seed ) {
     seed = seed;
     alpha = 0.618034;
     z = alpha + seed;
-    z = z - (float)(int)(z);
+    z -= (float)(int)(z);
   };
   float yield() {
     z = (z+alpha);
     // a slightly evil way to do z % 1 with floats
-    z = z - (float)(int)(z);
+    z -= (float)(int)(z);
     return z;
   };
   void reset(){
@@ -74,7 +74,7 @@ struct recurrent {
     seed = 0.5;
     z = 0;
   };
-  void set( float seed = 0.5, float alpha = 0.618034 ) {
+  void set( float seed = 0.5, float alpha = 0.618034 ){
     seed = seed;
     alpha = alpha;
   };

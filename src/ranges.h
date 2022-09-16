@@ -2,7 +2,6 @@
 #define RANGE_HEADER
 
 #include <vector>
-#include "Eigen/Dense"
 #include "utils.h"
 
 template <typename T> struct NumericRange{
@@ -56,9 +55,9 @@ template <typename T> struct NumericInterval{
     upper_val = range.upper;
     col_id = col;
   };
-  void print() {
-    std::cout << "Column: " << col_id << " with range " << lower_val << " to " << upper_val << "\n";
-  };
+  // void print() {
+  //   std::cout << "Column: " << col_id << " with range " << lower_val << " to " << upper_val << "\n";
+  // };
 };
 
 template <typename T> struct CategoricalSet{
@@ -69,13 +68,13 @@ template <typename T> struct CategoricalSet{
     col_id = col;
     set_vals = distinct(set);
   };
-  void print() {
-    std::cout << "Column: " << col_id << " with items: ";
-    for(auto &item: set_vals){
-      std::cout << " " << item << " ";
-    }
-    std::cout << "\n";
-  };
+  // void print() {
+  //   std::cout << "Column: " << col_id << " with items: ";
+  //   for(auto &item: set_vals){
+  //     std::cout << " " << item << " ";
+  //   }
+  //   std::cout << "\n";
+  // };
   int size(){
     return set_vals.size();
   };
@@ -95,27 +94,27 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
   std::vector<CategoricalSet<CategoricKind>> CategoricalSets;
 
   intervals(){};
-  intervals( Eigen::Matrix<NumericKind, Eigen::Dynamic, Eigen::Dynamic> num_data,
-             Eigen::Matrix<CategoricKind, Eigen::Dynamic, Eigen::Dynamic> cat_data ) {
-    NumericIntervals.reserve(num_data.cols());
-    for(int i = 0; i < num_data.cols(); i++) {
-      NumericIntervals.push_back(
-        // this basically says - take the column, compute range, push that into
-        // the numeric interval
-        NumericInterval<NumericKind>( min_max(num_data.col(i)), i)
-      );
-    }
-    CategoricalSets.reserve(cat_data.cols());
-
-    int total_num_cols = num_data.cols();
-    for(int i=0; i < cat_data.cols();i++) {
-      CategoricalSets.push_back(
-        // this basically says - take the column, compute range, push that into
-        // the numeric interval
-        CategoricalSet<CategoricKind>( distinct(cat_data.col(i)), i+total_num_cols)
-      );
-    }
-  }
+  // intervals( Eigen::Matrix<NumericKind, Eigen::Dynamic, Eigen::Dynamic> num_data,
+  //            Eigen::Matrix<CategoricKind, Eigen::Dynamic, Eigen::Dynamic> cat_data ) {
+  //   NumericIntervals.reserve(num_data.cols());
+  //   for(int i = 0; i < num_data.cols(); i++) {
+  //     NumericIntervals.push_back(
+  //       // this basically says - take the column, compute range, push that into
+  //       // the numeric interval
+  //       NumericInterval<NumericKind>( min_max(num_data.col(i)), i)
+  //     );
+  //   }
+  //   CategoricalSets.reserve(cat_data.cols());
+  // 
+  //   int total_num_cols = num_data.cols();
+  //   for(int i=0; i < cat_data.cols();i++) {
+  //     CategoricalSets.push_back(
+  //       // this basically says - take the column, compute range, push that into
+  //       // the numeric interval
+  //       CategoricalSet<CategoricKind>( distinct(cat_data.col(i)), i+total_num_cols)
+  //     );
+  //   }
+  // }
   void reserve(int num_size, int cat_size) {
     NumericIntervals.reserve(num_size);
     CategoricalSets.reserve(cat_size);
@@ -146,14 +145,14 @@ template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
 template <typename CategoricKind> struct CategoricalSplit {
   CategoricalSet<CategoricKind> left;
   CategoricalSet<CategoricKind> right;
-  void print() {
-    std::cout << "Categorical Split with elements left and right: \n";
-    std::cout << "Left: \n";
-    left.print();
-    std::cout << "Right: \n";
-    std::cout << "\n";
-    right.print();
-  }
+  // void print() {
+  //   std::cout << "Categorical Split with elements left and right: \n";
+  //   std::cout << "Left: \n";
+  //   left.print();
+  //   std::cout << "Right: \n";
+  //   std::cout << "\n";
+  //   right.print();
+  // }
 };
 
 template <typename T, class U> CategoricalSplit<T> sample( CategoricalSet<T> x, U & generator) {
