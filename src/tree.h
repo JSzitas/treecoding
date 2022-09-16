@@ -30,7 +30,7 @@ template <class RngGenerator>
 class Tree {
   public:
     Tree<RngGenerator>( 
-          Matrix<float, int> data,
+          storage::DataFrame<float, int> data,
           std::vector<int> numeric_cols,
           RngGenerator & generator,
           int max_depth = 8,
@@ -40,13 +40,8 @@ class Tree {
       gen = generator;
       X = data;
       cols = X.cols();
-      // allocate first tree node
-      // node *tree = new node;
-      // for( int i=0; i< cols; i++ ) {
-      //   if( !all_const( X.col(i) )) {
-      //     nonconst_cols.push_back(i);
-      //   }
-      // }
+      tree = node();
+      nonconst_cols = X.nonconst_cols(sequence(data.rows()));
       num_cols = numeric_cols;
     };
     void grow( node &tree,
@@ -105,33 +100,10 @@ class Tree {
         // recursive calls for constructing children
         grow(tree.children[i], row_ids, ranges, current_depth+1);
       }
-      // update ranges
-
-      // recursive calls to the left and right
-      // grow(tree.children[0], row_ids, ranges, current_depth+1);
-      // grow(tree.children[1], row_ids, ranges, current_depth+1);
     };
     void fit() {
-      // std::cout << "Growing." << "\n";
       grow( tree, sequence(0, (int)(X.rows()), 1), {}, 0 );
     };
-    // void summary() {
-    //   std::cout << "Max depth: " << tree_max_depth << "\n" ;
-    //   std::cout << "Min nodesize: " << tree_min_nodesize << "\n";
-    //   if( num_cols.size() > 0 ) {
-    //     std::cout << "Numeric columns: " << "\n";
-    //     for( auto & item : num_cols ) {
-    //       std::cout << item << " ";
-    //     }
-    //     std::cout << "\n";
-    //   }
-    //   if( nonconst_cols.size() > 0 ) {
-    //     std::cout << "Nonconst cols: " << "\n";
-    //     for( auto & item : nonconst_cols) {
-    //       std::cout << item << " ";
-    //     }
-    //   }
-    // };
     // creating predictions
     // void predict();
   private:

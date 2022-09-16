@@ -189,18 +189,6 @@ split_indices_within_set( VectorKind x,
   return result;
 }
 
-template < class Numeric, class Categorical > auto find_column( const Numeric &x,
-                                                                const Categorical &y,
-                                                                const int column ) {
-  if( column > x.cols() ) {
-    column -= x.cols();
-    return y.col(column);
-  }
-  else {
-    return x.col(column);
-  }
-}
-
 template <class VectorIndex > auto split_vector_indices( disjunct_indices<VectorIndex> reindex_indices,
                                                          VectorIndex original_indices ) {
   disjunct_indices<VectorIndex> result;
@@ -254,7 +242,7 @@ template < class T, typename U = int > T set_diff( const T x, const T y ) {
 // expect for cases where we are searching over small data... which is what
 // I anticipate we will be doing. Hopefully you can return to this later and
 // check this assummption
-template <class T> bool all_const( T a ) {
+template <class T> bool all_const( T &a ) {
   for( int i=1; i < a.size(); i++) {
     if( !is_same(a[i], a[0]) ) {
       return false;

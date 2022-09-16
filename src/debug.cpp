@@ -2,6 +2,8 @@
 using namespace Rcpp;
 #include "sampling.h"
 #include "utils.h"
+#include "stdio.h"
+#include "iostream"
 // #include "tree.h"
 #include "data.h"
 #include "rng.h"
@@ -22,10 +24,22 @@ std::vector<int> test_set_diff( std::vector<int> x, std::vector<int> y) {
   return set_diff(x,y);
 }
 
+// template <class T> void print_vector( T& x ) {
+//   for(int i=0;i<(x.size()-1);i++) {
+//   std::cout << x[i] << ", ";
+//   }  
+//   std::cout << x[(x.size()-1)] << std::endl;
+// }
+
+
 // [[Rcpp::export]]
-void load_data( int x ) {
-  storage::DataFrame<float,int> mydata;
-  // mydata.summary();
+void load_data( std::vector<std::vector<float>> x, std::vector<std::vector<int>> y ) {
+  storage::DataFrame<float,int> mydata( x, y );
+  auto seq = sequence(10);
+  auto res = mydata.geq( 10, 1, seq );
+  // print_vector(res.left);
+  auto rs = mydata.nonconst_cols();
+  // print_vector(rs);
 }
 
 

@@ -36,12 +36,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // load_data
-void load_data(int x);
-RcppExport SEXP _treecoding_load_data(SEXP xSEXP) {
+void load_data(std::vector<std::vector<float>> x, std::vector<std::vector<int>> y);
+RcppExport SEXP _treecoding_load_data(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type x(xSEXP);
-    load_data(x);
+    Rcpp::traits::input_parameter< std::vector<std::vector<float>> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::vector<int>> >::type y(ySEXP);
+    load_data(x, y);
     return R_NilValue;
 END_RCPP
 }
@@ -49,7 +50,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_treecoding_sample_rows_cpp", (DL_FUNC) &_treecoding_sample_rows_cpp, 3},
     {"_treecoding_test_set_diff", (DL_FUNC) &_treecoding_test_set_diff, 2},
-    {"_treecoding_load_data", (DL_FUNC) &_treecoding_load_data, 1},
+    {"_treecoding_load_data", (DL_FUNC) &_treecoding_load_data, 2},
     {NULL, NULL, 0}
 };
 
