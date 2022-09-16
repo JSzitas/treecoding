@@ -10,7 +10,7 @@ uint64_t bitwise_rotate(uint64_t x, int bits, int rotate_bits) {
 
 struct halton {
   halton(){
-    base=2;
+    b=2;
     y = 1;
     n=0;
     d=1;
@@ -20,33 +20,33 @@ struct halton {
     x = d-n;
     if(x == 1){
       n = 1;
-      d *= base;
+      d *= b;
     }
     else {
       y = d;
       while(x <= y) {
-        y /= base;
-        n = (base + 1) * y - x;
+        y /= b;
+        n = (b + 1) * y - x;
       }
     }
     return (float)(n/d);
   };
   void set( float base ) {
-    base = base;
+    b = base;
     y = 1;
     n = 0;
     d = 1;
     x = 1;
   };
   void reset(){
-    base=2;
+    b=2;
     y = 1;
     n = 0;
     d = 1;
     x = 1;
   };
   private:
-    float base, y, n, d, x;
+    float b, y, n, d, x;
 };
 
 
@@ -57,8 +57,8 @@ struct recurrent {
     z = alpha + seed;
     z -= (float)(int)(z);
   };
-  recurrent( float seed ) {
-    seed = seed;
+  recurrent( float init_seed ) {
+    seed = init_seed;
     alpha = 0.618034;
     z = alpha + seed;
     z -= (float)(int)(z);
@@ -73,10 +73,6 @@ struct recurrent {
     alpha = 0.618034;
     seed = 0.5;
     z = 0;
-  };
-  void set( float seed = 0.5, float alpha = 0.618034 ){
-    seed = seed;
-    alpha = alpha;
   };
   private:
     float alpha = 0.618034, seed = 0.5, z = 0;
