@@ -19,12 +19,15 @@ struct node {
   std::vector<node> children;
 };
 
-template <typename T, typename U> struct Splitter{
-  node_split<T,U> operator () () {
-
+template <typename Numeric, typename Categorical> struct RandomSplitter{
+  node_split<Numeric, Categorical> yield(std::vector<Numeric> &x,
+                                         std::vector<int> &subset) {
+    return min_max_subset(x, subset);
+  };
+  node_split<Numeric, Categorical> yield(std::vector<Categorical> &x) {
+    return ;
   };
 };
-
 
 template <class RngGenerator>
 class Tree {
@@ -64,22 +67,12 @@ class Tree {
       // for now we will only use random trees, we can try to extend this
       // later
       // generate column over which we will split
-      // int col = sample_int_from_set( nonconst_cols, gen );
+      int col = sample_int_from_set( X.nonconst_cols(row_ids);, gen );
       // // check that the column is not all const
       // // and if it is probably just update the nonconst_cols
       // // and GOTO before this happened. which I admit is ugly, but this is
       // // probably the one reasonable case where you want to do that.
-      // auto sel_col = X.col(col);
-      // if( all_const( sel_col )) {
-      //   // erase takes iterator
-      //   auto v = nonconst_cols.begin();
-      //   std::advance(v, col-1);
-      //   nonconst_cols.erase(v);
-      //
-      //   goto termination_label;
-      // }
-      // std::cout << current_depth << "\n";
-      //
+
       // node_split<float, int> node_vals;
 
       // check if col is a numeric column
@@ -93,8 +86,6 @@ class Tree {
       // determine where row ids go
 
       // allocate child nodes
-      // tree->left = new node;
-      // tree->right = new node;
       tree.children = std::vector<node>(tree_arity);
       for( int i = 0; i < tree_arity; i++) {
         // recursive calls for constructing children

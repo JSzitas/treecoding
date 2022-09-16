@@ -102,7 +102,6 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       }
       result.left.reserve(subset.size());
       result.right.reserve(subset.size());
-
       for( auto &index:subset ) {
         if(num_data[col][index] >= x) {
           // no idea if the moves are a good idea (particularly from the pov of 
@@ -116,19 +115,20 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       return result;
     };
     // TODO: add subset view to this
-    std::vector<int> nonconst_cols() {
+    std::vector<int> nonconst_cols( std::vector<int> &subset) {
       std::vector<int> result;
-      result.reserve(ncol);
-      int i=0;
-      for(; i < num_cols; i++ ) {
-        if( !all_const( num_data[i] ) ) {
-          result.push_back(i);
+      result.reserve(subset.size());
+      for( auto &i:subset) {
+        if( i > ncol ) {}
+        else if( i < num_cols ) {
+            if( !all_const( num_data[i] ) ) {
+              result.push_back(std::move(i));
+            }
         }
-      }
-      i = 0;
-      for(; i < cat_cols;i++) {
-        if( !all_const( cat_data[i] ) ) {
-          result.push_back(i+num_cols);
+        else{
+          if( !all_const( cat_data[i-num_cols] ) ) {
+            result.push_back(i);
+          }
         }
       }
       return result;

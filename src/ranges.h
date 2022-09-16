@@ -18,7 +18,7 @@ template <typename T> struct NumericRange{
   T upper, lower;
 };
 
-template <class T, typename U=float> NumericRange<U> min_max( T a) {
+template <class T, typename U=float> NumericRange<U> min_max( T &a) {
   NumericRange<U> result;
 
   result.lower = a[0];
@@ -30,6 +30,24 @@ template <class T, typename U=float> NumericRange<U> min_max( T a) {
     }
     if( a[i] > result.upper) {
       result.upper = a[i];
+    }
+  }
+  return result;
+}
+
+template <class T, typename U=float> NumericRange<U> min_max_subset( T &a,
+                                                                     std::vector<int> & subset) {
+  NumericRange<U> result;
+  
+  result.lower = a[subset[0]];
+  result.upper = a[subset[0]];
+  
+  for( int i=1; i < subset.size(); i++ ) {
+    if( a[i] < result.lower) {
+      result.lower = a[subset[i]];
+    }
+    if( a[i] > result.upper) {
+      result.upper = a[subset[i]];
     }
   }
   return result;
@@ -55,9 +73,6 @@ template <typename T> struct NumericInterval{
     upper_val = range.upper;
     col_id = col;
   };
-  // void print() {
-  //   std::cout << "Column: " << col_id << " with range " << lower_val << " to " << upper_val << "\n";
-  // };
 };
 
 template <typename T> struct CategoricalSet{
@@ -68,13 +83,6 @@ template <typename T> struct CategoricalSet{
     col_id = col;
     set_vals = distinct(set);
   };
-  // void print() {
-  //   std::cout << "Column: " << col_id << " with items: ";
-  //   for(auto &item: set_vals){
-  //     std::cout << " " << item << " ";
-  //   }
-  //   std::cout << "\n";
-  // };
   int size(){
     return set_vals.size();
   };
