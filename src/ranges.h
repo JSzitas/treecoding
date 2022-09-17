@@ -97,11 +97,22 @@ template <typename T> struct CategoricalSet{
   }
 };
 
+template <typename NumericKind, typename CategoricKind> struct node_split {
+  node_split<NumericKind, CategoricKind>(){};
+  NumericInterval<NumericKind> range;
+  CategoricalSet<CategoricKind> set;
+  bool type = false;
+};
+
 template <typename NumericKind, typename CategoricKind > struct intervals {
   std::vector<NumericInterval<NumericKind>> NumericIntervals;
   std::vector<CategoricalSet<CategoricKind>> CategoricalSets;
 
   intervals(){};
+  intervals( int num_reserved, int cat_reserved){
+    NumericIntervals = std::vector<NumericInterval<NumericKind>>(num_reserved);
+    CategoricalSets = std::vector<CategoricalSet<CategoricKind>>(cat_reserved);
+  };
   // intervals( Eigen::Matrix<NumericKind, Eigen::Dynamic, Eigen::Dynamic> num_data,
   //            Eigen::Matrix<CategoricKind, Eigen::Dynamic, Eigen::Dynamic> cat_data ) {
   //   NumericIntervals.reserve(num_data.cols());
@@ -127,17 +138,17 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
     NumericIntervals.reserve(num_size);
     CategoricalSets.reserve(cat_size);
   };
-  // maybe an update method
-  void add(NumericInterval<NumericKind> x) {
-    NumericIntervals.push_back(x);
+  void add(NumericInterval<NumericKind> x, int col) {
+    NumericIntervals[col] = x;
   };
-  void add(CategoricalSet<CategoricKind> x) {
-    CategoricalSets.push_back(x);
+  void add(CategoricalSet<CategoricKind> x, int col) {
+    CategoricalSets[col] = x;
   };
   // and a merge method (for merging multiple of these?)
 };
 
 template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sample_distinct(
+    int col,
     std::vector<CategoricKind> &x, 
     std::vector<int> &view, 
     Rng & generator, 
@@ -149,15 +160,10 @@ template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sampl
       result.push_back(std::move(val));
     }
   }
+  result.col_id = col;
   return result;
 }
 
-template <typename NumericKind, typename CategoricKind> struct node_split {
-  node_split<NumericKind, CategoricKind>(){};
-  NumericInterval<NumericKind> range;
-  CategoricalSet<CategoricKind> set;
-  bool type = false;
-};
 template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
   return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
 }

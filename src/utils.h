@@ -174,7 +174,6 @@ template <class T> bool all_const_view( T &a, std::vector<int> & view ) {
   return true;
 }
 
-
 template <class T, class U> int sample_int_from_set( T set, U & generator ) {
   return set[ (int)(generator.yield() * (float)set.size())];
 }

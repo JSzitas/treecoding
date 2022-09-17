@@ -2,16 +2,18 @@
 #define MATRIX_HEADER
 
 #include "vector"
+#include "ranges.h"
 
 namespace storage {
 
 template <typename T> struct split_result {
   split_result<T>() {
-    std::vector<T> left(0);
-    std::vector<T> right(0);
+    std::vector<std::vector<T>> children(2);
   };
-  std::vector<T> left;
-  std::vector<T> right;
+  std::vector<T> operator [] (int index) {
+    return children[index];
+  }
+  std::vector<std::vector<T>> children;
 };
 
 template <typename NumericKind, typename CategoricKind> class DataFrame {
@@ -25,9 +27,9 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       ncol = 0;
       nrow = 0;
     };
-    DataFrame<NumericKind, CategoricKind>( std::vector<std::vector<NumericKind>> &numerics,
-                                           std::vector<std::vector<CategoricKind>> &categoricals,
-                                           std::vector<std::vector<NumericKind>> & targets
+    DataFrame<NumericKind, CategoricKind>( std::vector<std::vector<NumericKind>> numerics,
+                                           std::vector<std::vector<CategoricKind>> categoricals,
+                                           std::vector<std::vector<NumericKind>> targets
                                           ) : num_data(numerics), cat_data(categoricals), targets(targets) {
       num_cols = numerics.size();
       cat_cols = categoricals.size();
@@ -59,20 +61,24 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
     void add_targets( std::vector<std::vector<NumericKind>> &x ) {
       targets = x;
     }
-    split_result<int> match( std::unordered_set<CategoricKind> &set, int col,
-                             std::vector<int> &subset ) {
+    split_result<int> set_match( std::vector<CategoricKind> &set, int col,
+                                 std::vector<int> &subset ) {
+      std::unordered_set<CategoricKind> newset;
+      for( auto &val:set ) {
+        newset.insert(val);
+      }
       split_result<int> result;
       if( col > (cat_cols-1) ) {
         return result;
       }
-      result.left.reserve(subset.size());
-      result.right.reserve(subset.size());
+      result[0].reserve(subset.size());
+      result[1].reserve(subset.size());
       for( auto &index:subset ) {
-        if( set.count(cat_data[col][index]) ) {
-          result.left.push_back(std::move(index));
+        if( newset.count(cat_data[col][index]) ) {
+          result[0].push_back(std::move(index));
         }
         else {
-          result.right.push_back(std::move(index));
+          result[1].push_back(std::move(index));
         }
       }
       return result;
@@ -82,15 +88,15 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       if( col > (num_cols-1) ) {
         return result;
       }
-      result.left.reserve(subset.size());
-      result.right.reserve(subset.size());
+      result[0].reserve(subset.size());
+      result[1].reserve(subset.size());
 
       for( auto &index:subset ) {
         if(num_data[col][index] <= x) {
-          result.left.push_back(std::move(index));
+          result[0].push_back(std::move(index));
         }
         else {
-          result.right.push_back(std::move(index));
+          result[1].push_back(std::move(index));
         }
       }
       return result;
@@ -100,16 +106,16 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       if( col > (num_cols-1) ) {
         return result;
       }
-      result.left.reserve(subset.size());
-      result.right.reserve(subset.size());
+      result[0].reserve(subset.size());
+      result[1].reserve(subset.size());
       for( auto &index:subset ) {
         if(num_data[col][index] >= x) {
           // no idea if the moves are a good idea (particularly from the pov of 
           // memory continguency), but its worth a try
-          result.left.push_back(std::move(index));
+          result[0].push_back(std::move(index));
         }
         else {
-          result.right.push_back(std::move(index));
+          result[1].push_back(std::move(index));
         }
       }
       return result;
@@ -156,12 +162,12 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       for(int i=0; i < ncol; i++) {
         if( i > ncol ) {}
         else if( i < num_cols ) {
-          if( !all_const_view( num_data[i] ) ) {
+          if( !all_const( num_data[i] ) ) {
             result.push_back(std::move(i));
           }
         }
         else{
-          if( !all_const_view( cat_data[i-num_cols] ) ) {
+          if( !all_const( cat_data[i-num_cols] ) ) {
             result.push_back(i);
           }
         }
@@ -177,9 +183,20 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       }
       return all_const_view( cat_data[col-num_cols], view);
     }
-  std::vector<std::vector<NumericKind>> &num_data;
-  std::vector<std::vector<CategoricKind>> &cat_data;
-  std::vector<std::vector<NumericKind>> &targets;
+    split_result<int> match( node_split<float, int> &a, 
+                            int col,
+                            std::vector<int> & subset ) {
+      std::vector<int> result;
+      if( a.type ) {
+        return seq( a.range.lower_val, col, subset );
+      }
+      else {
+        return set_match( cat_data[num_cols-col], col, subset );
+      }
+    };
+  std::vector<std::vector<NumericKind>> num_data;
+  std::vector<std::vector<CategoricKind>> cat_data;
+  std::vector<std::vector<NumericKind>> targets;
   int nrow;
   int ncol;
   int num_cols;

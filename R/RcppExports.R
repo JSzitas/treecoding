@@ -9,7 +9,7 @@ test_set_diff <- function(x, y) {
     .Call('_treecoding_test_set_diff', PACKAGE = 'treecoding', x, y)
 }
 
-load_data <- function(x, y) {
-    invisible(.Call('_treecoding_load_data', PACKAGE = 'treecoding', x, y))
+debug_tree <- function(num_cols, cat_cols, max_depth = 5L, min_nodesz = 30L) {
+    invisible(.Call('_treecoding_debug_tree', PACKAGE = 'treecoding', num_cols, cat_cols, max_depth, min_nodesz))
 }
 

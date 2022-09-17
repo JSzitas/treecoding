@@ -5,8 +5,8 @@
 #include <vector>
 #include "utils.h"
 #include "ranges.h"
-#include "iostream"
-#include "stdio.h"
+// #include "iostream"
+// #include "stdio.h"
 #include "data.h"
 
 struct node {
@@ -19,56 +19,59 @@ struct node {
   std::vector<node> children;
 };
 
-template <typename Numeric, typename Categorical, class RnGenerator> struct RandomSplitter{
-  RandomSplitter<Numeric, Categorical, RnGenerator>(RnGenerator & generator) : gen(generator) {;}
-  node_split<Numeric, Categorical> yield(std::vector<Numeric> &x,
-                                         std::vector<int> &subset) {
+template <typename Numeric, typename Categorical> struct RandomSplitter{
+  RandomSplitter<Numeric, Categorical>(){};
+  template <class RnGenerator> node_split<Numeric, Categorical> yield(
+                                         int col,
+                                         std::vector<Numeric> &x,
+                                         std::vector<int> &subset, 
+                                         RnGenerator & generator) {
     node_split<Numeric, Categorical> result;
     auto data = min_max_subset(x, subset);
-    result.range = std::move(NumericRange<Numeric>( data.lower, sample(data, gen)));
-    result.type = false;
-    return result;
-  };
-  node_split<Numeric, Categorical> yield(std::vector<Categorical> &x,
-                                         std::vector<int> &subset) {
-    node_split<Numeric, Categorical> result;
-    result.set = std::move(sample_distinct(x, subset, gen));
+    result.range = NumericInterval( NumericRange<Numeric>( data.lower, sample(data, generator)), col);
     result.type = true;
     return result;
   };
-  node_split<Numeric, Categorical> operator () (int col,
+  template <class RnGenerator> node_split<Numeric, Categorical> yield(
+                                         int col,
+                                         std::vector<Categorical> &x,
+                                         std::vector<int> &subset, 
+                                         RnGenerator & generator) {
+    node_split<Numeric, Categorical> result;
+    result.set = sample_distinct(col, x, subset, generator);
+    result.type = false;
+    return result;
+  };
+  template <class RnGenerator> node_split<Numeric, Categorical> operator () (
+                                                int col,
                                                 storage::DataFrame<Numeric, Categorical> &data,
-                                                std::vector<int> &subset) {
+                                                std::vector<int> &subset,
+                                                RnGenerator & generator) {
     if( col > data.num_cols) {
-      return yield( data.cat_data[col - data.num_cols], subset );
+      return yield( col, data.cat_data[col - data.num_cols], subset, generator);
     }
     else {
-      return yield(data.num_cols[col], subset);
+      return yield(col, data.num_data[col], subset, generator);
     }
   };
-  RnGenerator &gen;
 };
 
 template <class RngGenerator, class Splitter>
 class Tree {
   public:
-    Tree<RngGenerator>( 
+    Tree<RngGenerator, Splitter>( 
           storage::DataFrame<float, int> &data,
-          std::vector<int> numeric_cols,
           RngGenerator & generator,
           Splitter & splitter,
           int max_depth = 8,
-          int min_nodesize = 30) : X(data), splitter(splitter) {
-      tree_max_depth = max_depth;
-      tree_min_nodesize = min_nodesize;
-      gen = generator;
-      cols = data.cols();
+          int min_nodesize = 30) : X(data), splitter(splitter),
+          tree_max_depth(max_depth), tree_min_nodesize(min_nodesize), 
+          gen(generator){
       tree = node();
       nonconst_cols = data.nonconst_cols();
-      num_cols = numeric_cols;
     };
     void grow( node &tree,
-               std::vector<int> &row_ids,
+               std::vector<int> row_ids,
                intervals<float, int> ranges = {},
                int current_depth = 0,
                int tree_arity = 2){
@@ -98,30 +101,29 @@ class Tree {
         goto termination_check;
       }
       // declare split
-      auto split = splitter(col, X, &row_ids);
-      tree.range = std::move( split );
+      tree.range = splitter(col, X, row_ids, gen);
+      // ranges.add(tree.range, col);
       // determine where row ids go
-
+      auto split_child_ids = X.match( tree.range, col, row_ids );
       // allocate child nodes
       tree.children = std::vector<node>(tree_arity);
       for( int i = 0; i < tree_arity; i++) {
         // recursive calls for constructing children
-        grow(tree.children[i], row_ids, ranges, current_depth+1);
+        grow(tree.children[i], split_child_ids[i], ranges, current_depth+1);
       }
     };
     void fit() {
-      grow( tree, sequence(0, (int)(X.rows()), 1), {}, 0 );
+      auto seq = sequence(0, (int)(X.rows()), 1);
+      grow( tree, seq, {}, 0 );
     };
     // creating predictions
     // void predict();
   private:
-    std::vector<int> num_cols;
     int tree_max_depth;
     int tree_min_nodesize;
     storage::DataFrame<float, int> &X;
     node tree;
     Splitter splitter;
-    int cols;
     std::vector<int> nonconst_cols;
     RngGenerator &gen;
 };
