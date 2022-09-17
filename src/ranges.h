@@ -137,51 +137,44 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
   // and a merge method (for merging multiple of these?)
 };
 
+template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sample_distinct(
+    std::vector<CategoricKind> &x, 
+    std::vector<int> &view, 
+    Rng & generator, 
+    float balance = 0.5) {
+  CategoricalSet<CategoricKind> result;
+  auto distinct_vals = distinct( x, view );
+  for( auto &val:distinct_vals ) {
+    if( generator.yield() > balance) {
+      result.push_back(std::move(val));
+    }
+  }
+  return result;
+}
+
 template <typename NumericKind, typename CategoricKind> struct node_split {
-  // node_split<NumericKind,CategoricKind> (){
-  //   range = NumericInterval<NumericKind>();
-  //   type = true;
-  // };
-  NumericInterval<NumericKind> range;
-  CategoricalSet<CategoricKind> set;
+  union {
+    NumericInterval<NumericKind> range;
+    CategoricalSet<CategoricKind> set;
+  } data;
   bool type = false;
 };
 template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
   return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
 }
 
-template <typename CategoricKind> struct CategoricalSplit {
-  CategoricalSet<CategoricKind> left;
-  CategoricalSet<CategoricKind> right;
-  // void print() {
-  //   std::cout << "Categorical Split with elements left and right: \n";
-  //   std::cout << "Left: \n";
-  //   left.print();
-  //   std::cout << "Right: \n";
-  //   std::cout << "\n";
-  //   right.print();
-  // }
-};
+// template <typename CategoricKind> struct CategoricalSplit {
+//   CategoricalSet<CategoricKind> left;
+//   CategoricalSet<CategoricKind> right;
+//   // void print() {
+//   //   std::cout << "Categorical Split with elements left and right: \n";
+//   //   std::cout << "Left: \n";
+//   //   left.print();
+//   //   std::cout << "Right: \n";
+//   //   std::cout << "\n";
+//   //   right.print();
+//   // }
+// };
 
-template <typename T, class U> CategoricalSplit<T> sample( CategoricalSet<T> x, U & generator) {
-
-  CategoricalSplit<T> result;
-  result.left.reserve(x.size());
-  result.right.reserve(x.size());
-
-  // rewrite categorical set to work with iterators
-  for( int i=0; i< x.size(); i++){
-    if( generator.yield() > 0.5) {
-      result.left.push_back(x[i]);
-      result.left.col_id = x.col_id;
-    }
-    else {
-      result.right.push_back(x[i]);
-      result.right.col_id = x.col_id;
-    }
-  }
-
-  return result;
-}
 
 #endif

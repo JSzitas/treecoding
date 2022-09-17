@@ -114,24 +114,32 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       }
       return result;
     };
-    // TODO: add subset view to this
-    std::vector<int> nonconst_cols( std::vector<int> &subset) {
+    std::vector<int> nonconst_cols( std::vector<int> &subset, std::vector<int> &view) {
       std::vector<int> result;
       result.reserve(subset.size());
       for( auto &i:subset) {
         if( i > ncol ) {}
         else if( i < num_cols ) {
-            if( !all_const( num_data[i] ) ) {
+            if( !all_const( num_data[i], view ) ) {
               result.push_back(std::move(i));
             }
         }
         else{
-          if( !all_const( cat_data[i-num_cols] ) ) {
+          if( !all_const( cat_data[i-num_cols], view ) ) {
             result.push_back(i);
           }
         }
       }
       return result;
+    }
+    bool col_is_const( int col, std::vector<int> &view ) {
+      if( col > ncol ) {
+        return false;
+      }
+      else if( col < num_cols ) {
+        return all_const( num_data[col], view );
+      }
+      return all_const( cat_data[col-num_cols], view);
     }
 private:
   std::vector<std::vector<NumericKind>> num_data;

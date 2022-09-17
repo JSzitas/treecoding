@@ -10,7 +10,6 @@
 #include "data.h"
 
 struct node {
-  node(){};
   node_split<float, int> range;
   bool terminal = false;
   intervals<float, int> terminal_range;
@@ -22,10 +21,20 @@ struct node {
 template <typename Numeric, typename Categorical> struct RandomSplitter{
   node_split<Numeric, Categorical> yield(std::vector<Numeric> &x,
                                          std::vector<int> &subset) {
-    return min_max_subset(x, subset);
+    node_split<Numeric, Categorical> result;
+    result.data = min_max_subset(x, subset);
+    result.type = false;
+    return result;
   };
-  node_split<Numeric, Categorical> yield(std::vector<Categorical> &x) {
-    return ;
+  node_split<Numeric, Categorical> yield(std::vector<Categorical> &x,
+                                         std::vector<int> &subset) {
+    node_split<Numeric, Categorical> result;
+    result.data = sample_distinct(x, subset);
+    result.type = true;
+    return result;
+  };
+  node_split<Numeric, Categorical> operator () () {
+    
   };
 };
 
@@ -53,7 +62,7 @@ class Tree {
                int current_depth = 0,
                int tree_arity = 2){
       // the goto tag for when we found nothing to split on or a constant column
-      // termination_label:
+      termination_check:
       // termination
       if( row_ids.size() <= tree_min_nodesize || current_depth >= tree_max_depth || nonconst_cols.size() < 1) {
         // std::cout << "Terminal conditions met: ";
@@ -67,13 +76,17 @@ class Tree {
       // for now we will only use random trees, we can try to extend this
       // later
       // generate column over which we will split
-      int col = sample_int_from_set( X.nonconst_cols(row_ids);, gen );
+      int col = sample_int_from_set( X.nonconst_cols(nonconst_cols, row_ids);, gen );
       // // check that the column is not all const
       // // and if it is probably just update the nonconst_cols
       // // and GOTO before this happened. which I admit is ugly, but this is
       // // probably the one reasonable case where you want to do that.
-
-      // node_split<float, int> node_vals;
+      if( X.col_is_const( col, row_ids )) {
+        nonconst_cols = set_diff(nonconst_cols, col);
+        goto termination_check;
+      }
+      // declare split
+      node_split<float, int> node_vals;
 
       // check if col is a numeric column
       // if( belongs( num_cols, col) ) {
