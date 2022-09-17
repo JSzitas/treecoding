@@ -153,10 +153,9 @@ template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sampl
 }
 
 template <typename NumericKind, typename CategoricKind> struct node_split {
-  union {
-    NumericInterval<NumericKind> range;
-    CategoricalSet<CategoricKind> set;
-  } data;
+  node_split<NumericKind, CategoricKind>(){};
+  NumericInterval<NumericKind> range;
+  CategoricalSet<CategoricKind> set;
   bool type = false;
 };
 template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {

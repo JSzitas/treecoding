@@ -131,7 +131,43 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
         }
       }
       return result;
-    }
+    };
+    std::vector<int> nonconst_cols( std::vector<int> &subset) {
+      std::vector<int> result;
+      result.reserve(subset.size());
+      for( auto &i:subset) {
+        if( i > ncol ) {}
+        else if( i < num_cols ) {
+          if( !all_const_view( num_data[i] ) ) {
+            result.push_back(std::move(i));
+          }
+        }
+        else{
+          if( !all_const_view( cat_data[i-num_cols] ) ) {
+            result.push_back(i);
+          }
+        }
+      }
+      return result;
+    };
+    std::vector<int> nonconst_cols() {
+      std::vector<int> result;
+      result.reserve(ncol);
+      for(int i=0; i < ncol; i++) {
+        if( i > ncol ) {}
+        else if( i < num_cols ) {
+          if( !all_const_view( num_data[i] ) ) {
+            result.push_back(std::move(i));
+          }
+        }
+        else{
+          if( !all_const_view( cat_data[i-num_cols] ) ) {
+            result.push_back(i);
+          }
+        }
+      }
+      return result;
+    };
     bool col_is_const( int col, std::vector<int> &view ) {
       if( col > ncol ) {
         return false;
@@ -141,7 +177,6 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       }
       return all_const_view( cat_data[col-num_cols], view);
     }
-private:
   std::vector<std::vector<NumericKind>> &num_data;
   std::vector<std::vector<CategoricKind>> &cat_data;
   std::vector<std::vector<NumericKind>> &targets;
