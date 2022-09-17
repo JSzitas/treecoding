@@ -26,13 +26,13 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       nrow = 0;
     };
     DataFrame<NumericKind, CategoricKind>( std::vector<std::vector<NumericKind>> &numerics,
-                                           std::vector<std::vector<CategoricKind>> &categoricals) {
-      num_data = numerics;
-      cat_data = categoricals;
+                                           std::vector<std::vector<CategoricKind>> &categoricals,
+                                           std::vector<std::vector<NumericKind>> & targets
+                                          ) : num_data(numerics), cat_data(categoricals), targets(targets) {
       num_cols = numerics.size();
       cat_cols = categoricals.size();
       ncol = numerics.size() + categoricals.size();
-      nrow = num_data[0].size();
+      nrow = numerics[0].size();
     }
     int cols() {
       return ncol;
@@ -120,12 +120,12 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       for( auto &i:subset) {
         if( i > ncol ) {}
         else if( i < num_cols ) {
-            if( !all_const( num_data[i], view ) ) {
+            if( !all_const_view( num_data[i], view ) ) {
               result.push_back(std::move(i));
             }
         }
         else{
-          if( !all_const( cat_data[i-num_cols], view ) ) {
+          if( !all_const_view( cat_data[i-num_cols], view ) ) {
             result.push_back(i);
           }
         }
@@ -137,14 +137,14 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
         return false;
       }
       else if( col < num_cols ) {
-        return all_const( num_data[col], view );
+        return all_const_view( num_data[col], view );
       }
-      return all_const( cat_data[col-num_cols], view);
+      return all_const_view( cat_data[col-num_cols], view);
     }
 private:
-  std::vector<std::vector<NumericKind>> num_data;
-  std::vector<std::vector<CategoricKind>> cat_data;
-  std::vector<std::vector<NumericKind>> targets;
+  std::vector<std::vector<NumericKind>> &num_data;
+  std::vector<std::vector<CategoricKind>> &cat_data;
+  std::vector<std::vector<NumericKind>> &targets;
   int nrow;
   int ncol;
   int num_cols;

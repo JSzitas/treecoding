@@ -36,12 +36,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // load_data
-void load_data(std::vector<std::vector<float>> x, std::vector<std::vector<int>> y);
+void load_data(std::vector<std::vector<float>>& x, std::vector<std::vector<int>>& y);
 RcppExport SEXP _treecoding_load_data(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<std::vector<float>> >::type x(xSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::vector<int>> >::type y(ySEXP);
+    Rcpp::traits::input_parameter< std::vector<std::vector<float>>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::vector<int>>& >::type y(ySEXP);
     load_data(x, y);
     return R_NilValue;
 END_RCPP

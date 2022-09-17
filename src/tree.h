@@ -18,24 +18,30 @@ struct node {
   std::vector<node> children;
 };
 
-template <typename Numeric, typename Categorical> struct RandomSplitter{
+template <typename Numeric, typename Categorical, class RnGenerator> struct RandomSplitter{
+  RandomSplitter<Numeric, Categorical, RnGenerator>(RnGenerator & generator) : gen(generator) {;}
   node_split<Numeric, Categorical> yield(std::vector<Numeric> &x,
                                          std::vector<int> &subset) {
     node_split<Numeric, Categorical> result;
-    result.data = min_max_subset(x, subset);
+    auto data = min_max_subset(x, subset);
+    result.data = sample(data, gen);
     result.type = false;
     return result;
   };
   node_split<Numeric, Categorical> yield(std::vector<Categorical> &x,
                                          std::vector<int> &subset) {
     node_split<Numeric, Categorical> result;
-    result.data = sample_distinct(x, subset);
+    result.data = sample_distinct(x, subset, gen);
     result.type = true;
     return result;
   };
-  node_split<Numeric, Categorical> operator () () {
+  node_split<Numeric, Categorical> operator () (int col,
+                                                storage::DataFrame<Numeric, Categorical> &x,
+                                                std::vector<int> &subset) {
+    
     
   };
+  RnGenerator &gen;
 };
 
 template <class RngGenerator>
@@ -86,7 +92,7 @@ class Tree {
         goto termination_check;
       }
       // declare split
-      node_split<float, int> node_vals;
+      // node_split<float, int> node_vals;
 
       // check if col is a numeric column
       // if( belongs( num_cols, col) ) {

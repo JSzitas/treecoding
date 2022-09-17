@@ -163,18 +163,4 @@ template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
   return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
 }
 
-// template <typename CategoricKind> struct CategoricalSplit {
-//   CategoricalSet<CategoricKind> left;
-//   CategoricalSet<CategoricKind> right;
-//   // void print() {
-//   //   std::cout << "Categorical Split with elements left and right: \n";
-//   //   std::cout << "Left: \n";
-//   //   left.print();
-//   //   std::cout << "Right: \n";
-//   //   std::cout << "\n";
-//   //   right.print();
-//   // }
-// };
-
-
 #endif
