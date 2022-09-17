@@ -8,6 +8,7 @@
 // #include "iostream"
 // #include "stdio.h"
 #include "data.h"
+#include "memory"
 
 struct node {
   node(){};
@@ -83,7 +84,6 @@ class Tree {
           current_depth >= tree_max_depth ||
           nonconst_cols.size() < 1) {
         tree.terminal_range = ranges;
-        tree.node_size = row_ids.size();
         tree.terminal = true;
         return;
       }
@@ -91,7 +91,7 @@ class Tree {
       // for now we will only use random trees, we can try to extend this
       // later
       // generate column over which we will split
-      int col = sample_int_from_set( X.nonconst_cols(nonconst_cols, row_ids), gen );
+      int col = sample_int_from_set( nonconst_cols, gen );
       // // check that the column is not all const
       // // and if it is probably just update the nonconst_cols
       // // and GOTO before this happened. which I admit is ugly, but this is
@@ -101,24 +101,27 @@ class Tree {
         goto termination_check;
       }
       // declare split
-      tree.range = splitter(col, X, row_ids, gen);
+      auto split_res = splitter(col, X, row_ids, gen);
+      tree.range = split_res;
       // ranges.add(tree.range, col);
       // determine where row ids go
-      auto split_child_ids = X.match( tree.range, col, row_ids );
+      // std::cout << col << std::endl;
+      // auto split_child_ids = X.match( split_res, col, row_ids );
       // allocate child nodes
-      tree.children = std::vector<node>(tree_arity);
-      for( int i = 0; i < tree_arity; i++) {
-        // recursive calls for constructing children
-        grow(tree.children[i], split_child_ids[i], ranges, current_depth+1);
-      }
+      // tree.children = std::vector<node>(tree_arity, node());
+      return;
+      // for( int i= 0; i < tree_arity; i++) {
+      //   // tree.children.push_back(node());
+      //   grow(tree.children[i], split_child_ids[i], ranges, current_depth+1);
+      // }
     };
     void fit() {
       auto seq = sequence(0, (int)(X.rows()), 1);
-      grow( tree, seq, {}, 0 );
+      grow( tree, seq, {}, 0, 2 );
     };
     // creating predictions
     // void predict();
-  private:
+  // private:
     int tree_max_depth;
     int tree_min_nodesize;
     storage::DataFrame<float, int> &X;

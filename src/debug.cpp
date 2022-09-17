@@ -52,8 +52,6 @@ void debug_tree(std::vector<std::vector<float>> num_cols,
                 int min_nodesz = 30) {
   std::vector<std::vector<float>> targ(0);
   storage::DataFrame<float,int> X( num_cols, cat_cols, targ );
-  auto res = X.nonconst_cols();
-  // print_vector( res );
   recurrent rec;
   RandomSplitter<float, int> splittr{};
   Tree tree(X, rec, splittr, max_depth, min_nodesz);

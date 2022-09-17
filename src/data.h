@@ -183,15 +183,16 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       }
       return all_const_view( cat_data[col-num_cols], view);
     }
+    // there is a silly bug somewhere here
     split_result<int> match( node_split<float, int> &a, 
                             int col,
                             std::vector<int> & subset ) {
       std::vector<int> result;
       if( a.type ) {
-        return seq( a.range.lower_val, col, subset );
+        return seq( a.range.upper_val, col, subset );
       }
       else {
-        return set_match( cat_data[num_cols-col], col, subset );
+        return set_match( cat_data[col-num_cols], col, subset );
       }
     };
   std::vector<std::vector<NumericKind>> num_data;
