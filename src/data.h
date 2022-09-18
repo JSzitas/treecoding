@@ -9,13 +9,6 @@ namespace storage {
 template <typename T> struct split_result {
   std::vector<T> left;
   std::vector<T> right;
-  // split_result<T>() {
-  //   std::vector<std::vector<T>> children(2);
-  // };
-  // std::vector<T> operator [] (int index) {
-  //   return children[index];
-  // }
-  // std::vector<std::vector<T>> children;
 };
 
 template <typename NumericKind, typename CategoricKind> class DataFrame {
@@ -23,7 +16,7 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
     DataFrame<NumericKind, CategoricKind>() {
       num_data = std::vector<std::vector<NumericKind>>(0);
       cat_data = std::vector<std::vector<CategoricKind>>(0);
-      targets = std::vector<std::vector<CategoricKind>>(0);
+      targets = std::vector<std::vector<NumericKind>>(0);
       num_cols = 0;
       cat_cols=0;
       ncol = 0;
@@ -113,7 +106,7 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       result.right.reserve(subset.size());
       for( auto &index:subset ) {
         if(num_data[col][index] >= x) {
-          // no idea if the moves are a good idea (particularly from the pov of 
+          // no idea if the moves are a good idea (particularly from the pov of
           // memory continguency), but its worth a try
           result.left.push_back(std::move(index));
         }
@@ -186,14 +179,13 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       }
       return all_const_view( cat_data[col-num_cols], view);
     }
-    // there is a silly bug somewhere here
-    split_result<int> match( node_split<float, int> &x, 
+    split_result<int> match( node_split<float, int> &x,
                             std::vector<int> & subset ) {
       if( x.type ) {
         return seq( x.range.upper_val, x.range.col_id, subset );
       }
       else {
-        return set_match( x.set, x.range.col_id - num_cols, subset );
+        return set_match( x.set, x.set.col_id - num_cols, subset );
       }
     };
   std::vector<std::vector<NumericKind>> num_data;
@@ -204,6 +196,6 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
   int num_cols;
   int cat_cols;
 };
-}
+};
 
 #endif

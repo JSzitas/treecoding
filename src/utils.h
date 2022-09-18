@@ -175,7 +175,7 @@ template <class T> bool all_const_view( T &a, std::vector<int> & view ) {
 }
 
 template <class T, class U> int sample_int_from_set( T set, U & generator ) {
-  // the -1 is absolutely necessary - if you try to access set[ set.size() ], 
+  // the -1 is absolutely necessary - if you try to access set[ set.size() ],
   // this explodes
   return set[ (int)(generator.yield() * (float)set.size()) - 1];
 }
@@ -208,5 +208,20 @@ template <class T, class U> void shuffle( T &a, U &generator ) {
     swap(a[i], a[j]);
   }
 }
+
+std::vector<int> make_pow2_indices( int power_of_2 ) {
+  // these indices are always the numbers between the power of 2 (leftmost node)
+  // until the first number preceding the next power of 2 (rightmost node)
+  int lower = 2<<power_of_2;
+  int upper = 2<<(power_of_2+1);
+
+  std::vector<int> result;
+  result.reserve(upper-lower-1);
+  for(int i = lower; i <upper; i ++ ) {
+    result.push_back(i);
+  }
+  return result;
+}
+
 
 #endif
