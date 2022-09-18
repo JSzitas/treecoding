@@ -2,29 +2,8 @@
 #define UTIL_HEADER
 
 #include <vector>
-#include "rng.h"
 
-template <class T> auto min_elem( T &a) {
-  auto result = a[0];
-  for( int i = 1; i < a.size(); i++ ) {
-    if(a[i] < result) {
-      result = a[i];
-    }
-  }
-  return result;
-}
-
-template <class T > auto max_elem( T &a) {
-  auto result = a[0];
-  for( int i = 1; i < a.size(); i++ ) {
-    if(a[i] > result) {
-      result = a[i];
-    }
-  }
-  return result;
-}
-
-template <class T, typename U = int> std::vector<U> distinct( T a ) {
+template <class T, typename U = int> std::vector<U> distinct( T &a ) {
   std::vector<U> result;
   result.reserve(a.size());
   // reserving for all uniques might be overtly pessimistic, but
@@ -64,56 +43,12 @@ template <class T, typename U = int> std::vector<U> distinct( T &a, std::vector<
   return result;
 }
 
-
-template <typename T> std::vector<T> sequence( const T from, const T to, const T by ) {
-  int size = (int)(to-from)/by;
-  std::vector<T> result( size );
-  result[0] = from;
-  for( int i = 1; i < size; i++) {
-    result[i] = result[i-1] + by;
-  }
-  return result;
-}
-
 std::vector<int> sequence( const int size ) {
   std::vector<int> result( size );
   result[0] = 0;
   for( int i = 1; i < size; i++) {
     result[i] = result[i-1] + 1;
   }
-  return result;
-}
-
-template < class T, typename U > std::vector<bool> smaller_than( T x, U val ) {
-  std::vector<bool> result;
-  result.reserve(x.size());
-
-  for( auto & value : val) {
-    if( value < val) {
-      result.push_back(true);
-    }
-    else{
-      result.push_back(false);
-    }
-  }
-  return result;
-}
-
-template < class T > T which( std::vector<bool> x, bool invert = false ) {
-  T result;
-  result.reserve(x.size());
-  int total_size = 0;
-  for( int i=0; i< x.size(); i++) {
-    if( x[i] ) {
-      result.push_back(i);
-      total_size += 1;
-    }
-    else if( invert ) {
-      result.push_back(i);
-      total_size += 1;
-    }
-  }
-  result.resize(total_size);
   return result;
 }
 
@@ -150,8 +85,6 @@ template <class T, typename U=int> T set_diff( T &x, U &y) {
   }
   return result;
 }
-
-
 // I think this should be, in theory, slower than e.g. an unordered map search
 // expect for cases where we are searching over small data... which is what
 // I anticipate we will be doing. Hopefully you can return to this later and
@@ -172,41 +105,6 @@ template <class T> bool all_const_view( T &a, std::vector<int> & view ) {
     }
   }
   return true;
-}
-
-template <class T, class U> int sample_int_from_set( T set, U & generator ) {
-  // the -1 is absolutely necessary - if you try to access set[ set.size() ],
-  // this explodes
-  return set[ (int)(generator.yield() * (float)set.size()) - 1];
-}
-
-template <class U> int sample_int_from_set( int first, int last, U & generator ) {
-  return (int)((generator.yield() * (float)(last - first)) + (float)first);
-}
-
-template <class U> int sample_int_from_set( int last, U & generator ) {
-  return (int)(generator.yield() * (float)(last));
-}
-
-template <typename R, class U> R sample_from_range( R last, U & generator ) {
-  return (R)(generator.yield() * (float)(last));
-}
-
-template <typename T> void swap(T &a, T &b) {
-  a = a+b;
-  b = a-b;
-  a = a-b;
-}
-
-template <class T, class U> void shuffle( T &a, U &generator ) {
-  int j;
-  auto seq = sequence(a.size());
-  for( int i=0; i< a.size(); i++ ) {
-    // find something to swap with
-    j = sample_int_from_set( seq, generator );
-    // call swap
-    swap(a[i], a[j]);
-  }
 }
 
 std::vector<int> make_pow2_indices( int power_of_2 ) {

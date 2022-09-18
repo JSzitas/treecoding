@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include "utils.h"
+#include "ranges.h"
 
 template <typename T> std::vector<T> set_to_vect(std::unordered_set<T> &x) {
   std::vector<T> result;
@@ -30,7 +31,7 @@ template <typename T, class Generator> std::vector<T> sample_rows( const std::ve
     return result;
   }
   std::unordered_set<T> uniques;
-  
+
   T sample;
   for(long unsigned int i=0; i< x.size(); i++) {
     sample = x[(int)(gen.yield() * x.size())];
@@ -44,28 +45,31 @@ template <typename T, class Generator> std::vector<T> sample_rows( const std::ve
   return result;
 }
 
-template <typename T, class Generator> T runif( T a, T b, Generator & gen ) {
-  return ((b - a)*gen.yield()) + a;
+template <class T, class U> int sample_int_from_set( T set, U & generator ) {
+  // the -1 is absolutely necessary - if you try to access set[ set.size() ],
+  // this explodes
+  return set[ (int)(generator.yield() * ((float)set.size() - 1))];
 }
 
-template <class T, typename U = int> T distinct( T &a ) {
-  T result;
-  result.reserve(a.size());
-  // reserving for all uniques might be overtly pessimistic, but
-  // I am not sure what the impact on performance of push_back would be
-  // otherwise... if its slow I will consider a fix :)
-  // result.reserve(a.size());
-  // using std::set
-  std::unordered_set<U> uniques;
-  int current_size = 0;
-  for( auto &item : a ) {
-    uniques.insert(item);
-    if( uniques.size() > current_size ) {
-      current_size++;
-      result.push_back(item);
+template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sample_distinct(
+    int col,
+    std::vector<CategoricKind> &x,
+    std::vector<int> &view,
+    Rng & generator,
+    float balance = 0.5) {
+  CategoricalSet<CategoricKind> result;
+  auto distinct_vals = distinct( x, view );
+  for( auto &val:distinct_vals ) {
+    if( generator.yield() > balance) {
+      result.push_back(std::move(val));
     }
   }
+  result.col_id = col;
   return result;
+}
+
+template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
+  return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
 }
 
 #endif

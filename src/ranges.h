@@ -38,10 +38,10 @@ template <class T, typename U=float> NumericRange<U> min_max( T &a) {
 template <class T, typename U=float> NumericRange<U> min_max_subset( T &a,
                                                                      std::vector<int> & subset) {
   NumericRange<U> result;
-  
+
   result.lower = a[subset[0]];
   result.upper = a[subset[0]];
-  
+
   for( int i=1; i < subset.size(); i++ ) {
     if( a[i] < result.lower) {
       result.lower = a[subset[i]];
@@ -124,7 +124,7 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
   //     );
   //   }
   //   CategoricalSets.reserve(cat_data.cols());
-  // 
+  //
   //   int total_num_cols = num_data.cols();
   //   for(int i=0; i < cat_data.cols();i++) {
   //     CategoricalSets.push_back(
@@ -147,25 +147,5 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
   // and a merge method (for merging multiple of these?)
 };
 
-template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sample_distinct(
-    int col,
-    std::vector<CategoricKind> &x, 
-    std::vector<int> &view, 
-    Rng & generator, 
-    float balance = 0.5) {
-  CategoricalSet<CategoricKind> result;
-  auto distinct_vals = distinct( x, view );
-  for( auto &val:distinct_vals ) {
-    if( generator.yield() > balance) {
-      result.push_back(std::move(val));
-    }
-  }
-  result.col_id = col;
-  return result;
-}
-
-template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
-  return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
-}
 
 #endif
