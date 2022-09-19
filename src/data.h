@@ -203,6 +203,6 @@ template <typename NumericKind, typename CategoricKind, typename TargetKind=floa
   int cat_cols;
   int target_cols;
 };
-};
+}
 
 #endif

@@ -47,7 +47,7 @@ template <typename Numeric, typename Categorical> struct RandomSplitter{
     result.range = NumericInterval( NumericRange<Numeric>( data.lower, sample(data, generator)), col);
     result.type = true;
     return result;
-  };
+  }
   template <class RnGenerator> node_split<Numeric, Categorical> yield(
       int col,
       std::vector<Categorical> &x,
@@ -57,7 +57,7 @@ template <typename Numeric, typename Categorical> struct RandomSplitter{
     result.set = sample_distinct(col, x, subset, generator);
     result.type = false;
     return result;
-  };
+  }
   template <class RnGenerator> node_split<Numeric, Categorical> operator () (
       int col,
       storage::DataFrame<Numeric, Categorical> &data,
@@ -100,7 +100,7 @@ public:
   node* grow( std::vector<int> &row_ids, std::vector<int> nonconst_cols, int id =1 ) {
     node * tree = new node();
     tree->node_id = id;
-    int col;
+    int col=0;
     for( int i=0; i < nonconst_cols.size(); i++ ){
       // if we have no nonconst columns, return
       if( nonconst_cols.size() < 1 ) {
