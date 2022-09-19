@@ -10,49 +10,22 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// sample_rows_cpp
-std::vector<int> sample_rows_cpp(std::vector<int> x, int size, bool repl);
-RcppExport SEXP _treecoding_sample_rows_cpp(SEXP xSEXP, SEXP sizeSEXP, SEXP replSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<int> >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< bool >::type repl(replSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_rows_cpp(x, size, repl));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_set_diff
-std::vector<int> test_set_diff(std::vector<int> x, std::vector<int> y);
-RcppExport SEXP _treecoding_test_set_diff(SEXP xSEXP, SEXP ySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<int> >::type x(xSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(test_set_diff(x, y));
-    return rcpp_result_gen;
-END_RCPP
-}
-// debug_tree
-void debug_tree(std::vector<std::vector<float>> num_cols, std::vector<std::vector<int>> cat_cols, int max_depth, int min_nodesz);
-RcppExport SEXP _treecoding_debug_tree(SEXP num_colsSEXP, SEXP cat_colsSEXP, SEXP max_depthSEXP, SEXP min_nodeszSEXP) {
+// tree
+void tree(std::vector<std::vector<float>> num_cols, std::vector<std::vector<int>> cat_cols, int max_depth, int min_nodesz);
+RcppExport SEXP _treecoding_tree(SEXP num_colsSEXP, SEXP cat_colsSEXP, SEXP max_depthSEXP, SEXP min_nodeszSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::vector<std::vector<float>> >::type num_cols(num_colsSEXP);
     Rcpp::traits::input_parameter< std::vector<std::vector<int>> >::type cat_cols(cat_colsSEXP);
     Rcpp::traits::input_parameter< int >::type max_depth(max_depthSEXP);
     Rcpp::traits::input_parameter< int >::type min_nodesz(min_nodeszSEXP);
-    debug_tree(num_cols, cat_cols, max_depth, min_nodesz);
+    tree(num_cols, cat_cols, max_depth, min_nodesz);
     return R_NilValue;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_treecoding_sample_rows_cpp", (DL_FUNC) &_treecoding_sample_rows_cpp, 3},
-    {"_treecoding_test_set_diff", (DL_FUNC) &_treecoding_test_set_diff, 2},
-    {"_treecoding_debug_tree", (DL_FUNC) &_treecoding_debug_tree, 4},
+    {"_treecoding_tree", (DL_FUNC) &_treecoding_tree, 4},
     {NULL, NULL, 0}
 };
 

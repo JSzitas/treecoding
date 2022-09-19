@@ -10,9 +10,6 @@ using namespace Rcpp;
 
 // [[Rcpp::plugins("cpp17")]]
 
-
-// [[Rcpp::plugins("cpp17")]]
-
 // [[Rcpp::export]]
 void tree(std::vector<std::vector<float>> num_cols,
                 std::vector<std::vector<int>> cat_cols,
