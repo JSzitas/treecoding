@@ -43,11 +43,13 @@ template <class T, typename U = int> std::vector<U> distinct( T &a, std::vector<
   return result;
 }
 
-std::vector<int> sequence( const int size ) {
-  std::vector<int> result( size );
-  result[0] = 0;
-  for( int i = 1; i < size; i++) {
-    result[i] = result[i-1] + 1;
+std::vector<int> sequence( int size ) {
+  std::vector<int> result;
+  result.reserve(size);
+  int item = 0;
+  for( int i = 0; i < size; i++) {
+    result.push_back(item);
+    item++;
   }
   return result;
 }
@@ -117,6 +119,27 @@ std::vector<int> make_pow2_indices( int power_of_2 ) {
   result.reserve(upper-lower-1);
   for(int i = lower; i <upper; i ++ ) {
     result.push_back(i);
+  }
+  return result;
+}
+
+std::vector<int> make_pow2_indices_even( int power_of_2 ) {
+  // these indices are always the numbers between the power of 2 (leftmost node)
+  // until the first number preceding the next power of 2 (rightmost node)
+  int lower = 2<<power_of_2;
+  int upper = 2<<(power_of_2+1);
+
+  std::vector<int> result;
+  result.reserve((upper-lower-1)/2);
+  bool push = true;
+  for(int i = lower; i <upper; i ++ ) {
+    if(push) {
+      result.push_back(i);
+      push = false;
+    }
+    else{
+      push = true;
+    }
   }
   return result;
 }

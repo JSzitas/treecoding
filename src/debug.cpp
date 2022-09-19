@@ -10,8 +10,11 @@ using namespace Rcpp;
 
 // [[Rcpp::plugins("cpp17")]]
 
+
+// [[Rcpp::plugins("cpp17")]]
+
 // [[Rcpp::export]]
-void debug_tree(std::vector<std::vector<float>> num_cols,
+void tree(std::vector<std::vector<float>> num_cols,
                 std::vector<std::vector<int>> cat_cols,
                 int max_depth = 5,
                 int min_nodesz = 30) {
@@ -21,8 +24,12 @@ void debug_tree(std::vector<std::vector<float>> num_cols,
   RandomSplitter<float, int> splittr{};
   Tree tree(X, rec, splittr, max_depth, min_nodesz);
   tree.fit();
-}
+  // encode
+  auto res = tree.encode( X );
+  // decode
 
+  // verify decoding results
+}
 
 
 // RCPP_EXPOSED_CLASS(Tree);

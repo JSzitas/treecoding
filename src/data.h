@@ -7,27 +7,34 @@
 namespace storage {
 
 template <typename T> struct split_result {
+  split_result<T> () {
+    this->left = std::vector<T>(0);
+    this->right = std::vector<T>(0);
+  }
   std::vector<T> left;
   std::vector<T> right;
 };
 
-template <typename NumericKind, typename CategoricKind> class DataFrame {
+// add a sort of 'tagged union' subview over the DataFrame (to avoid having to work with variants)
+
+template <typename NumericKind, typename CategoricKind, typename TargetKind=float> class DataFrame {
   public:
-    DataFrame<NumericKind, CategoricKind>() {
+    DataFrame<NumericKind, CategoricKind, TargetKind>() {
       num_data = std::vector<std::vector<NumericKind>>(0);
       cat_data = std::vector<std::vector<CategoricKind>>(0);
-      targets = std::vector<std::vector<NumericKind>>(0);
+      targets = std::vector<std::vector<TargetKind>>(0);
       num_cols = 0;
       cat_cols=0;
       ncol = 0;
       nrow = 0;
     };
-    DataFrame<NumericKind, CategoricKind>( std::vector<std::vector<NumericKind>> numerics,
+    DataFrame<NumericKind, CategoricKind, TargetKind>( std::vector<std::vector<NumericKind>> numerics,
                                            std::vector<std::vector<CategoricKind>> categoricals,
-                                           std::vector<std::vector<NumericKind>> targets
+                                           std::vector<std::vector<TargetKind>> targets
                                           ) : num_data(numerics), cat_data(categoricals), targets(targets) {
       num_cols = numerics.size();
       cat_cols = categoricals.size();
+      target_cols = targets.size();
       ncol = numerics.size() + categoricals.size();
       nrow = numerics[0].size();
     }
@@ -156,8 +163,7 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
       std::vector<int> result;
       result.reserve(ncol);
       for(int i=0; i < ncol; i++) {
-        if( i > ncol ) {}
-        else if( i < num_cols ) {
+        if( i < num_cols ) {
           if( !all_const( num_data[i] ) ) {
             result.push_back(std::move(i));
           }
@@ -190,11 +196,12 @@ template <typename NumericKind, typename CategoricKind> class DataFrame {
     };
   std::vector<std::vector<NumericKind>> num_data;
   std::vector<std::vector<CategoricKind>> cat_data;
-  std::vector<std::vector<NumericKind>> targets;
+  std::vector<std::vector<TargetKind>> targets;
   int nrow;
   int ncol;
   int num_cols;
   int cat_cols;
+  int target_cols;
 };
 };
 
