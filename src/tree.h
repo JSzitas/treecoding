@@ -31,6 +31,12 @@ struct encoded {
   int node_id;
 };
 
+struct decoded {
+  intervals<float, int> decoded;
+  int observation_id;
+};
+
+
 template <typename Numeric, typename Categorical> struct RandomSplitter{
   RandomSplitter<Numeric, Categorical>(){};
   template <class RnGenerator> node_split<Numeric, Categorical> yield(
@@ -77,8 +83,9 @@ public:
     RngGenerator & generator,
     Splitter & splitter,
     int max_depth = 8,
-    int min_nodesize = 30) : X(data), gen(generator), node_splitter(splitter),
-    tree_max_depth(max_depth), tree_min_nodesize(min_nodesize){
+    int min_nodesize = 30) : tree_max_depth(max_depth),
+    tree_min_nodesize(min_nodesize), X(data),
+    node_splitter(splitter), gen(generator) {
     nonconst_cols = data.nonconst_cols();
   };
   ~Tree() {
@@ -148,8 +155,17 @@ public:
     encode_recursion( this->tree, seq, result, newx);
     return result;
   }
-  void decode( ) {
-
+  std::vector<decoded> decode( std::vector<encoded> &terminal_ids ) {
+    // find unique terminal values:
+    std::unordered_set<int> terminal_set;
+    for( auto &terminal_node:terminal_ids ) {
+      if( !terminal_set.count(terminal_node.node_id)) {
+        // add terminal node to possible list
+        terminal_set.insert(terminal_node.node_id);
+      }
+    }
+    std::vector<decoded> result;
+    return result;
   }
   // void predict();
 private:
