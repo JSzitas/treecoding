@@ -77,8 +77,8 @@ public:
     RngGenerator & generator,
     Splitter & splitter,
     int max_depth = 8,
-    int min_nodesize = 30) : X(data), node_splitter(splitter),
-    gen(generator), tree_max_depth(max_depth), tree_min_nodesize(min_nodesize){
+    int min_nodesize = 30) : X(data), gen(generator), node_splitter(splitter),
+    tree_max_depth(max_depth), tree_min_nodesize(min_nodesize){
     nonconst_cols = data.nonconst_cols();
   };
   ~Tree() {
