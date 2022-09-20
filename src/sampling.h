@@ -52,7 +52,6 @@ template <class T, class U> int sample_int_from_set( T set, U & generator ) {
 }
 
 template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sample_distinct(
-    int col,
     std::vector<CategoricKind> &x,
     std::vector<int> &view,
     Rng & generator,
@@ -64,7 +63,6 @@ template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sampl
       result.push_back(std::move(val));
     }
   }
-  result.col_id = col;
   return result;
 }
 

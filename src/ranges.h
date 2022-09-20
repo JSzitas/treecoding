@@ -55,23 +55,19 @@ template <class T, typename U=float> NumericRange<U> min_max_subset( T &a,
 
 template <typename T> struct NumericInterval{
   T lower_val, upper_val;
-  int col_id;
   NumericInterval(){};
-  NumericInterval(T lower, T upper, int col) {
-    col_id = col;
+  NumericInterval(T lower, T upper) {
     lower_val = lower;
     upper_val = upper;
   };
-  NumericInterval( NumericRange<T> range, int col ){
+  NumericInterval( NumericRange<T> range ){
     lower_val = range.lower;
     upper_val = range.upper;
-    col_id = col;
   };
-  NumericInterval( std::vector<T> vec, int col ){
+  NumericInterval( std::vector<T> vec ){
     auto range = min_max(vec);
     lower_val = range.lower;
     upper_val = range.upper;
-    col_id = col;
   };
 };
 
@@ -79,8 +75,7 @@ template <typename T> struct CategoricalSet{
   std::vector<T> set_vals;
   int col_id;
   CategoricalSet(){};
-  CategoricalSet(std::vector<T> set, int col) {
-    col_id = col;
+  CategoricalSet(std::vector<T> set) {
     set_vals = distinct(set);
   };
   int size(){
@@ -101,6 +96,7 @@ template <typename NumericKind, typename CategoricKind> struct node_split {
   node_split<NumericKind, CategoricKind>(){};
   NumericInterval<NumericKind> range;
   CategoricalSet<CategoricKind> set;
+  int col;
   bool type = false;
 };
 

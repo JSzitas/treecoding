@@ -2,8 +2,6 @@
 using namespace Rcpp;
 #include "sampling.h"
 #include "utils.h"
-// #include "stdio.h"
-// #include "iostream"
 #include "tree.h"
 #include "data.h"
 #include "rng.h"

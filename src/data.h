@@ -14,6 +14,18 @@ template <typename T> struct split_result {
   std::vector<T> left;
   std::vector<T> right;
 };
+// TODO
+template <typename NumericKind, typename CategoricKind> struct col_view {
+  col_view(){
+    this->col = std::vector<NumericKind>(0);
+    this->numeric = true;
+  };
+  union {
+    std::vector<NumericKind> num_col;
+    std::vector<CategoricKind> cat_col;
+  } col;
+  bool numeric;
+};
 
 // add a sort of 'tagged union' subview over the DataFrame (to avoid having to work with variants)
 
@@ -37,6 +49,19 @@ template <typename NumericKind, typename CategoricKind, typename TargetKind=floa
       target_cols = targets.size();
       ncol = numerics.size() + categoricals.size();
       nrow = numerics[0].size();
+    }
+    col_view<NumericKind, CategoricKind> col(int which) {
+      col_view<NumericKind, CategoricKind> result;
+      if( which >= this->num_cols) {
+        result.col = this->cat_data[which - this->num_cols];
+        result.numeric = false;
+      }
+      else {
+        result.col = this->num_data[which];
+        // this is unnecessary due to how col_view is constructed on line 55
+        // result.numeric = true;
+      }
+      return result;
     }
     int cols() {
       return ncol;
@@ -186,12 +211,12 @@ template <typename NumericKind, typename CategoricKind, typename TargetKind=floa
       return all_const_view( cat_data[col-num_cols], view);
     }
     split_result<int> match( node_split<float, int> &x,
-                            std::vector<int> & subset ) {
+                             std::vector<int> & subset ) {
       if( x.type ) {
-        return seq( x.range.upper_val, x.range.col_id, subset );
+        return seq( x.range.upper_val, x.col, subset );
       }
       else {
-        return set_match( x.set, x.set.col_id - num_cols, subset );
+        return set_match( x.set, x.col - num_cols, subset );
       }
     };
   std::vector<std::vector<NumericKind>> num_data;

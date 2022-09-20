@@ -1,14 +1,10 @@
-#ifndef TREE2_HEADER
-#define TREE2_HEADER
+#ifndef TREE_HEADER
+#define TREE_HEADER
 
 #include <vector>
 #include "utils.h"
 #include "ranges.h"
 #include "data.h"
-#include "iostream"
-#include "stdio.h"
-#include <cstdio>
-
 
 struct node {
   node() {
@@ -44,8 +40,9 @@ template <typename Numeric, typename Categorical> struct RandomSplitter{
       RnGenerator & generator) {
     node_split<Numeric, Categorical> result;
     auto data = min_max_subset(x, subset);
-    result.range = NumericInterval( NumericRange<Numeric>( data.lower, sample(data, generator)), col);
+    result.range = NumericInterval( NumericRange<Numeric>( data.lower, sample(data, generator)));
     result.type = true;
+    result.col = col;
     return result;
   }
   template <class RnGenerator> node_split<Numeric, Categorical> yield(
@@ -54,8 +51,9 @@ template <typename Numeric, typename Categorical> struct RandomSplitter{
       std::vector<int> &subset,
       RnGenerator & generator) {
     node_split<Numeric, Categorical> result;
-    result.set = sample_distinct(col, x, subset, generator);
+    result.set = sample_distinct(x, subset, generator);
     result.type = false;
+    result.col = col;
     return result;
   }
   template <class RnGenerator> node_split<Numeric, Categorical> operator () (
@@ -63,7 +61,6 @@ template <typename Numeric, typename Categorical> struct RandomSplitter{
       storage::DataFrame<Numeric, Categorical> &data,
       std::vector<int> &subset,
       RnGenerator & generator) {
-    // this is probably a memory error because of indexing by 1 vs 0
     if( col >= data.num_cols) {
       return yield( col, data.cat_data[col - data.num_cols], subset, generator);
     }
@@ -72,16 +69,6 @@ template <typename Numeric, typename Categorical> struct RandomSplitter{
     }
   }
 };
-
-template <class T> void print_vector( T& x ) {
-  if( x.size() == 0 ) {
-    return;
-  }
-  for(int i=0;i<(x.size()-1);i++) {
-    std::cout << x[i] << ", ";
-  }
-  std::cout << x[(x.size()-1)] << std::endl;
-}
 
 template <class RngGenerator, class Splitter> class Tree {
 public:
@@ -161,13 +148,15 @@ public:
     encode_recursion( this->tree, seq, result, newx);
     return result;
   }
+  void decode( ) {
+
+  }
   // void predict();
 private:
   int tree_max_depth;
   int tree_min_nodesize;
   storage::DataFrame<float, int> &X;
   node *tree;
-  // std::vector<node> tree;
   Splitter &node_splitter;
   std::vector<int> nonconst_cols;
   RngGenerator &gen;

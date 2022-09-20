@@ -144,5 +144,4 @@ std::vector<int> make_pow2_indices_even( int power_of_2 ) {
   return result;
 }
 
-
 #endif
