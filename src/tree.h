@@ -32,10 +32,15 @@ struct encoded {
 };
 
 struct decoded {
-  intervals<float, int> decoded;
-  int observation_id;
+  decoded(){
+    this->node_id = 0;
+    this->observation_ids = std::vector<int>(0);
+    this->decoded_values = intervals<float, int>();
+  };
+  intervals<float, int> decoded_values;
+  std::vector<int> observation_ids;
+  int node_id;
 };
-
 
 template <typename Numeric, typename Categorical> struct RandomSplitter{
   RandomSplitter<Numeric, Categorical>(){};
@@ -164,6 +169,10 @@ public:
         terminal_set.insert(terminal_node.node_id);
       }
     }
+    // path through the terminal nodes which we need and collect terminal values
+    // 
+    
+    
     std::vector<decoded> result;
     return result;
   }

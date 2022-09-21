@@ -69,6 +69,9 @@ template <typename T> struct NumericInterval{
     lower_val = range.lower;
     upper_val = range.upper;
   };
+  void print() {
+    std::cout << "Range with values: " << lower_val << " to " << upper_val;
+  }
 };
 
 template <typename T> struct CategoricalSet{
@@ -90,6 +93,12 @@ template <typename T> struct CategoricalSet{
   void reserve(int x) {
     set_vals.reserve(x);
   }
+  void print() {
+    std::cout << "Set with values: ";
+    for( auto &item:set_vals ) {
+      std::cout << item << ", ";
+    }
+  }
 };
 
 template <typename NumericKind, typename CategoricKind> struct node_split {
@@ -100,48 +109,61 @@ template <typename NumericKind, typename CategoricKind> struct node_split {
   bool type = false;
 };
 
-template <typename NumericKind, typename CategoricKind > struct intervals {
-  std::vector<NumericInterval<NumericKind>> NumericIntervals;
-  std::vector<CategoricalSet<CategoricKind>> CategoricalSets;
-
-  intervals(){};
-  intervals( int num_reserved, int cat_reserved){
-    NumericIntervals = std::vector<NumericInterval<NumericKind>>(num_reserved);
-    CategoricalSets = std::vector<CategoricalSet<CategoricKind>>(cat_reserved);
-  };
-  // intervals( Eigen::Matrix<NumericKind, Eigen::Dynamic, Eigen::Dynamic> num_data,
-  //            Eigen::Matrix<CategoricKind, Eigen::Dynamic, Eigen::Dynamic> cat_data ) {
-  //   NumericIntervals.reserve(num_data.cols());
-  //   for(int i = 0; i < num_data.cols(); i++) {
-  //     NumericIntervals.push_back(
-  //       // this basically says - take the column, compute range, push that into
-  //       // the numeric interval
-  //       NumericInterval<NumericKind>( min_max(num_data.col(i)), i)
-  //     );
-  //   }
-  //   CategoricalSets.reserve(cat_data.cols());
-  //
-  //   int total_num_cols = num_data.cols();
-  //   for(int i=0; i < cat_data.cols();i++) {
-  //     CategoricalSets.push_back(
-  //       // this basically says - take the column, compute range, push that into
-  //       // the numeric interval
-  //       CategoricalSet<CategoricKind>( distinct(cat_data.col(i)), i+total_num_cols)
-  //     );
-  //   }
-  // }
-  void reserve(int num_size, int cat_size) {
-    NumericIntervals.reserve(num_size);
-    CategoricalSets.reserve(cat_size);
-  };
-  void add(NumericInterval<NumericKind> x, int col) {
-    NumericIntervals[col] = x;
-  };
-  void add(CategoricalSet<CategoricKind> x, int col) {
-    CategoricalSets[col] = x;
-  };
-  // and a merge method (for merging multiple of these?)
+template <class T> struct interval_box{
+  interval_box() {
+    this->interval = T();
+    this->col = 0;
+  }
+  void print() {
+    std::cout << "Interval ";
+    interval.print();
+    std::cout << " at column " << col << std::endl;
+  }
+  T interval;
+  int col;
 };
 
+template <typename NumericKind, typename CategoricKind > struct intervals {
+  intervals(){
+    this->NumericIntervals = std::vector<interval_box<NumericInterval<NumericKind>>>(0);
+    this->CategoricalSets = std::vector<interval_box<CategoricalSet<CategoricKind>>>(0);
+  };
+  void add(NumericInterval<NumericKind> x, int col) {
+    interval_box<NumericInterval<NumericKind>> newbox;
+    newbox.interval = x;
+    newbox.col = col;
+    for( int i=0; i < NumericIntervals.size(); i++ ) {
+      if( col == NumericIntervals[i].col) {
+        NumericIntervals[i] = newbox;
+        return;
+      }
+    }
+    // if not present, add it to the set
+    NumericIntervals.push_back(newbox);
+  };
+  void add(CategoricalSet<CategoricKind> x, int col) {
+    interval_box<CategoricalSet<CategoricKind>> newbox;
+    newbox.interval = x;
+    newbox.col = col;
+    for( int i=0; i < CategoricalSets.size(); i++ ) {
+      if( col == CategoricalSets[i].col) {
+        CategoricalSets[i] = newbox;
+        return;
+      }
+    }
+    // if not present, add it to the set
+    CategoricalSets.push_back(newbox);
+  };
+  void print() {
+    for( int i=0; i < NumericIntervals.size(); i++ ) {
+      NumericIntervals[i].print();
+    }
+    for( int i=0; i < CategoricalSets.size(); i++ ) {
+      CategoricalSets[i].print();
+    }
+  }
+  std::vector<interval_box<NumericInterval<NumericKind>>> NumericIntervals;
+  std::vector<interval_box<CategoricalSet<CategoricKind>>> CategoricalSets;
+};
 
 #endif
