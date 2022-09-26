@@ -6,15 +6,6 @@
 #include "utils.h"
 #include "ranges.h"
 
-template <typename T> std::vector<T> set_to_vect(std::unordered_set<T> &x) {
-  std::vector<T> result;
-  result.reserve(x.size());
-  for (auto it = x.begin(); it != x.end(); ) {
-    result.push_back(std::move(x.extract(it++).value()));
-  }
-  return result;
-}
-
 template <typename T, class Generator> std::vector<T> sample_rows( const std::vector<T> &x,
                                                                    long unsigned int size,
                                                                    Generator & gen,

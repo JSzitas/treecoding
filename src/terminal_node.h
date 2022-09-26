@@ -1,20 +1,21 @@
-#ifndef TERMINAL_HEADER 
+#ifndef TERMINAL_HEADER
 #define TERMINAL_HEADER
 
 #include "ranges.h"
 
 template <typename Numeric> struct NumInterval {
-  NumInterval( Numeric upper, Numeric lower ) : upper(upper), lower(lower){};
+  NumInterval(){};
+  NumInterval<Numeric>( Numeric upper, Numeric lower ) : upper(upper), lower(lower){};
   Numeric upper, lower;
 };
 
 template <typename Categorical> struct CatSet {
-  CatSet( std::vector<Categorical> set ) : set(set) {};
+  CatSet(){};
+  CatSet<Categorical>( std::vector<Categorical> set ) : set(set) {};
   std::vector<Categorical> set;
 };
 
 template <typename Numeric, typename Categorical> struct terminal_node {
-  
   terminal_node(){
     this->NumIntervals = std::vector<interval_box<NumInterval<Numeric>>>(0);
     this->CatSets = std::vector<interval_box<CatSet<Categorical>>>(0);
@@ -54,12 +55,8 @@ template <typename Numeric, typename Categorical> struct terminal_node {
     }
   }
 private:
-  std::vector<interval_box<NumericInterval<Numeric>>> NumIntervals;
-  std::vector<interval_box<CategoricalSet<Categorical>>> CatSets;
+  std::vector<interval_box<NumInterval<Numeric>>> NumIntervals;
+  std::vector<interval_box<CatSet<Categorical>>> CatSets;
 };
-
-
-
-
 
 #endif

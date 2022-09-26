@@ -58,6 +58,17 @@ std::vector<int> find_tree_path( int terminal_id ) {
   return result;
 }
 
+std::vector<int> match_terminal_nodes( std::vector<encoded> &x,
+                                       int terminal_node ) {
+  std::vector<int> result;
+  for( auto &item:x ) {
+    if(item.node_id == terminal_node) {
+      result.push_back(item.observation_id);
+    }
+  }
+  return result;
+}
+
 terminal_node<float, int> decode_terminal_path( node *tree,
                                                 std::vector<int> &path ) {
     terminal_node<float, int> result;
@@ -176,7 +187,7 @@ public:
     auto split_res = this->node_splitter(col, this->X, row_ids, this->gen);
     tree->range = split_res;
     auto res = X.match(tree->range, row_ids);
-    // if we fail to produce 2 children, stop 
+    // if we fail to produce 2 children, stop
     if( res.left.size() > tree_min_nodesize &&
         res.right.size() > this->tree_min_nodesize &&
         nonconst_cols.size() > 0) {
@@ -225,17 +236,26 @@ public:
         terminal_set.insert(terminal_node.node_id);
       }
     }
+    auto terminal = set_to_vect(terminal_set);
     // path through the terminal nodes which we need and collect terminal values
-    auto all_paths = map( terminal_set, find_tree_path );
-    
-    std::vector<decoded> result;
+    std::vector<std::vector<int>> all_paths;
+    for( auto &item:terminal ) {
+      all_paths.push_back(find_tree_path(item));
+    }
+
     std::vector<terminal_node<float, int>> decoding_paths;
     decoding_paths.reserve(all_paths.size());
     // over all paths, get the terminal node values
     for( auto &path:all_paths ) {
       decoding_paths.push_back(decode_terminal_path(this->tree, path));
     }
-    
+
+    std::vector<decoded> result;
+    for( int i=0; i < decoding_paths.size(); i++ ) {
+      result[i].decoded_values = decoding_paths[i];
+      result[i].observation_ids = match_terminal_nodes( terminal_ids, terminal[i]);
+    }
+
     return result;
   }
   void print_recursion( node* current_node, int depth = 1) {

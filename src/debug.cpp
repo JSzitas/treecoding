@@ -17,13 +17,12 @@ void debug_ranges() {
   CategoricalSet<int> cat_x( std::vector<int>{0,2,6} );
   CategoricalSet<int> cat_x2( std::vector<int>{ 1,7,19} );
   NumericInterval<float> num_x2( 1.2, 7.2 );
-  
+
   intervals<float, int> intv;
   intv.add(num_x, 1);
   intv.add(num_x2, 3);
   intv.add(cat_x, 7);
   intv.add(cat_x2, 8);
-  
   intv.print();
 }
 
@@ -44,8 +43,8 @@ void tree(std::vector<std::vector<float>> num_cols,
     item.print();
   }
   // decode
-  
-  
+
+
   // print
   tree.print();
 
