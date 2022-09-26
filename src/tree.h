@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "ranges.h"
 #include "data.h"
+#include "terminal_node.h"
 
 struct node {
   node() {
@@ -27,20 +28,72 @@ struct encoded {
     this->observation_id = 0;
     this->node_id = 0;
   };
+  void print() {
+    std::cout << "Node: " << node_id << " Observation: "<< observation_id << std::endl;
+  }
   int observation_id;
   int node_id;
 };
 
 struct decoded {
   decoded(){
-    this->node_id = 0;
+    // this->node_id = 0;
     this->observation_ids = std::vector<int>(0);
-    this->decoded_values = intervals<float, int>();
+    this->decoded_values = terminal_node<float, int>();
   };
-  intervals<float, int> decoded_values;
+  terminal_node<float, int> decoded_values;
   std::vector<int> observation_ids;
-  int node_id;
+  // int node_id;
 };
+
+std::vector<int> find_tree_path( int terminal_id ) {
+  std::vector<int> result;
+  // result.reserve(2);
+  int current_id = terminal_id;
+  while( current_id >= 1 ) {
+    result.push_back(current_id);
+    current_id =(int) current_id/2;
+  }
+  reverse(result);
+  return result;
+}
+
+terminal_node<float, int> decode_terminal_path( node *tree,
+                                                std::vector<int> &path ) {
+    terminal_node<float, int> result;
+    bool left, num;
+    // this only passes linearly through the tree - hence we can
+    for( int i=0; i < (path.size()-1); i++ ) {
+      // at current depth determine if we will go left or right
+      left = (path[i+1] % 2 )-1;
+      num = tree->range.type;
+      if( left ) {
+        if(num) {
+          auto val = NumInterval<float>( tree->range.range.lower_val, tree->range.range.middle_val );
+          result.add( val, tree->range.col );
+        }
+        else {
+          auto val = CatSet<int>( tree->range.set.set_vals );
+          result.add( val, tree->range.col );
+        }
+        // move tree pointer to left
+        tree = tree->left;
+      }
+      else{
+        if(num) {
+          auto val = NumInterval<float>( tree->range.range.middle_val, tree->range.range.upper_val );
+          result.add( val, tree->range.col );
+        }
+        else {
+          auto val = CatSet<int>( tree->range.set.out_vals );
+          result.add( val, tree->range.col );
+        }
+        // move tree pointer to right
+        tree = tree->right;
+      }
+    }
+  return result;
+}
 
 template <typename Numeric, typename Categorical> struct RandomSplitter{
   RandomSplitter<Numeric, Categorical>(){};
@@ -51,7 +104,8 @@ template <typename Numeric, typename Categorical> struct RandomSplitter{
       RnGenerator & generator) {
     node_split<Numeric, Categorical> result;
     auto data = min_max_subset(x, subset);
-    result.range = NumericInterval( NumericRange<Numeric>( data.lower, sample(data, generator)));
+    auto middle = sample(data, generator);
+    result.range = NumericInterval(data.lower, middle, data.upper);
     result.type = true;
     result.col = col;
     return result;
@@ -62,7 +116,9 @@ template <typename Numeric, typename Categorical> struct RandomSplitter{
       std::vector<int> &subset,
       RnGenerator & generator) {
     node_split<Numeric, Categorical> result;
-    result.set = sample_distinct(x, subset, generator);
+    auto newset = distinct( x, subset);
+    auto split_res = split_set( newset, generator );
+    result.set = CategoricalSet<Categorical>( split_res.left, split_res.right );
     result.type = false;
     result.col = col;
     return result;
@@ -120,13 +176,13 @@ public:
     auto split_res = this->node_splitter(col, this->X, row_ids, this->gen);
     tree->range = split_res;
     auto res = X.match(tree->range, row_ids);
-    if( res.left.size() > tree_min_nodesize && nonconst_cols.size() > 0) {
+    // if we fail to produce 2 children, stop 
+    if( res.left.size() > tree_min_nodesize &&
+        res.right.size() > this->tree_min_nodesize &&
+        nonconst_cols.size() > 0) {
       tree->left = grow( res.left, nonconst_cols, 2*id );
-    }
-    if( res.right.size() > this->tree_min_nodesize && nonconst_cols.size() > 0 ) {
       tree->right = grow( res.right, nonconst_cols, (2*id)+1 );
     }
-    // tree.index = row_ids;
     return tree;
   }
   void fit() {
@@ -170,11 +226,31 @@ public:
       }
     }
     // path through the terminal nodes which we need and collect terminal values
-    // 
-    
+    auto all_paths = map( terminal_set, find_tree_path );
     
     std::vector<decoded> result;
+    std::vector<terminal_node<float, int>> decoding_paths;
+    decoding_paths.reserve(all_paths.size());
+    // over all paths, get the terminal node values
+    for( auto &path:all_paths ) {
+      decoding_paths.push_back(decode_terminal_path(this->tree, path));
+    }
+    
     return result;
+  }
+  void print_recursion( node* current_node, int depth = 1) {
+    if( current_node == NULL ) {
+      return;
+    }
+    for( int i=0; i < depth; i++) {
+      std::cout << "--";
+    }
+    std::cout << current_node->node_id << std::endl;
+    print_recursion( current_node->left, depth+1);
+    print_recursion( current_node->right, depth+1);
+  }
+  void print() {
+    print_recursion( this->tree, 1);
   }
   // void predict();
 private:

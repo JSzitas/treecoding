@@ -54,33 +54,44 @@ template <class T, typename U=float> NumericRange<U> min_max_subset( T &a,
 }
 
 template <typename T> struct NumericInterval{
-  T lower_val, upper_val;
   NumericInterval(){};
   NumericInterval(T lower, T upper) {
     lower_val = lower;
     upper_val = upper;
+    middle_val = (upper-lower)/2;
+  };
+  NumericInterval(T lower, T middle, T upper) {
+    lower_val = lower;
+    upper_val = upper;
+    middle_val = middle;
   };
   NumericInterval( NumericRange<T> range ){
     lower_val = range.lower;
     upper_val = range.upper;
+    middle_val = (range.upper-range.lower)/2;
   };
   NumericInterval( std::vector<T> vec ){
     auto range = min_max(vec);
     lower_val = range.lower;
     upper_val = range.upper;
+    middle_val = (range.upper-range.lower)/2;
   };
   void print() {
     std::cout << "Range with values: " << lower_val << " to " << upper_val;
   }
+  T lower_val, middle_val, upper_val;
 };
 
 template <typename T> struct CategoricalSet{
-  std::vector<T> set_vals;
-  int col_id;
   CategoricalSet(){};
   CategoricalSet(std::vector<T> set) {
     set_vals = distinct(set);
+    out_vals = std::vector<T>(0);
   };
+  CategoricalSet( std::vector<T> inset, std::vector<T> outset ) {
+    set_vals = inset;
+    out_vals = outset;
+  }
   int size(){
     return set_vals.size();
   };
@@ -99,6 +110,8 @@ template <typename T> struct CategoricalSet{
       std::cout << item << ", ";
     }
   }
+  std::vector<T> set_vals;
+  std::vector<T> out_vals;
 };
 
 template <typename NumericKind, typename CategoricKind> struct node_split {
@@ -162,8 +175,9 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
       CategoricalSets[i].print();
     }
   }
-  std::vector<interval_box<NumericInterval<NumericKind>>> NumericIntervals;
-  std::vector<interval_box<CategoricalSet<CategoricKind>>> CategoricalSets;
+  private:
+    std::vector<interval_box<NumericInterval<NumericKind>>> NumericIntervals;
+    std::vector<interval_box<CategoricalSet<CategoricKind>>> CategoricalSets;
 };
 
 #endif

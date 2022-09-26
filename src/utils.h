@@ -87,6 +87,7 @@ template <class T, typename U=int> T set_diff( T &x, U &y) {
   }
   return result;
 }
+
 // I think this should be, in theory, slower than e.g. an unordered map search
 // expect for cases where we are searching over small data... which is what
 // I anticipate we will be doing. Hopefully you can return to this later and
@@ -140,6 +141,30 @@ std::vector<int> make_pow2_indices_even( int power_of_2 ) {
     else{
       push = true;
     }
+  }
+  return result;
+}
+
+template <typename T> void swap( T &a, T&b ) {
+  // a is a+ b >> we need to subtract a from it
+  a = a+b;
+  // b is a + b >> subtract b to get a
+  b = a-b;
+  // a is a+b >> we need to subtract b (which is equal to original a) to get b
+  a = a-b;
+}
+
+template <class T> void reverse( T &a ) {
+  for( int i=0; i < a.size()/2; i++ ) {
+    swap( a[i], a[a.size()-1 -i]);
+  }
+}
+
+template <class T, class Callable> T map( T &a, Callable & b ) {
+  T result;
+  result.reserve(a.size());
+  for( auto &item:a ) {
+    result.push_back(b(a));
   }
   return result;
 }

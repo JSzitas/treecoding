@@ -70,4 +70,27 @@ template <typename T, class U> T sample( NumericRange<T> x, U & generator ) {
   return (T)((T)generator.yield() * (x.upper - x.lower)) + x.lower;
 }
 
+template <class T> struct split_box {
+  T left, right;
+};
+
+template <class T, class Generator> split_box<T> split_set( T &set,
+                                                            Generator &gen,
+                                                            float balance = 0.5) {
+    split_box<T> result;
+    auto distinct_vals = distinct( set);
+    for( auto &val:distinct_vals ) {
+      if( gen.yield() > balance) {
+        result.left.push_back(std::move(val));
+      }
+      else{
+        result.right.push_back(std::move(val));
+      }
+    }
+    return result;
+}
+
+
+
+
 #endif

@@ -213,7 +213,7 @@ template <typename NumericKind, typename CategoricKind, typename TargetKind=floa
     split_result<int> match( node_split<float, int> &x,
                              std::vector<int> & subset ) {
       if( x.type ) {
-        return seq( x.range.upper_val, x.col, subset );
+        return seq( x.range.middle_val, x.col, subset );
       }
       else {
         return set_match( x.set, x.col - num_cols, subset );

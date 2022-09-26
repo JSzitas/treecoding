@@ -5,11 +5,9 @@ using namespace Rcpp;
 #include "tree.h"
 #include "data.h"
 #include "rng.h"
-
 #include "ranges.h"
 
-#include "iostream"
-#include "stdio.h"
+#include "ioutils.h"
 
 // [[Rcpp::plugins("cpp17")]]
 
@@ -29,9 +27,6 @@ void debug_ranges() {
   intv.print();
 }
 
-
-
-
 // [[Rcpp::export]]
 void tree(std::vector<std::vector<float>> num_cols,
                 std::vector<std::vector<int>> cat_cols,
@@ -45,10 +40,33 @@ void tree(std::vector<std::vector<float>> num_cols,
   tree.fit();
   // encode
   auto res = tree.encode( X );
+  for( auto &item:res ) {
+    item.print();
+  }
   // decode
+  
+  
+  // print
+  tree.print();
 
   // verify decoding results
 }
+
+// [[Rcpp::export]]
+void test_splitbox( std::vector<int> x ) {
+  recurrent rec;
+  auto res = split_set(x, rec);
+  // return res.left;
+  // print_vector(res.left);
+  // print_vector(res.right);
+}
+
+
+
+
+
+
+
 
 
 // RCPP_EXPOSED_CLASS(Tree);
