@@ -9,8 +9,8 @@
 
 struct node {
   node() {
-    this->left = NULL;
-    this->right = NULL;
+    this->left = nullptr;
+    this->right = nullptr;
     this->range = node_split<float,int>();
     this->node_id = 1;
   };
@@ -71,38 +71,38 @@ std::vector<int> match_terminal_nodes( std::vector<encoded> &x,
 
 terminal_node<float, int> decode_terminal_path( node *tree,
                                                 std::vector<int> &path ) {
-    terminal_node<float, int> result;
-    bool left, num;
-    // this only passes linearly through the tree - hence we can
-    for( int i=0; i < (path.size()-1); i++ ) {
-      // at current depth determine if we will go left or right
-      left = (path[i+1] % 2 )-1;
-      num = tree->range.type;
-      if( left ) {
-        if(num) {
-          auto val = NumInterval<float>( tree->range.range.lower_val, tree->range.range.middle_val );
-          result.add( val, tree->range.col );
-        }
-        else {
-          auto val = CatSet<int>( tree->range.set.set_vals );
-          result.add( val, tree->range.col );
-        }
-        // move tree pointer to left
-        tree = tree->left;
+
+  terminal_node<float, int> result;
+  NumInterval<float> num_val;
+  CatSet<int> cat_val;
+  node * current_node = tree;
+  for( int i=1; i < path.size(); i++) {
+    // this determines if we go left or right
+    if(path[i] % 2 == 0) {
+      // determine if we are assigning a categorical or numeric value
+      if(tree->range.type) {
+        num_val.set(tree->range.range.lower_val, tree->range.range.middle_val);
+        result.add(num_val, tree->range.col);
       }
-      else{
-        if(num) {
-          auto val = NumInterval<float>( tree->range.range.middle_val, tree->range.range.upper_val );
-          result.add( val, tree->range.col );
-        }
-        else {
-          auto val = CatSet<int>( tree->range.set.out_vals );
-          result.add( val, tree->range.col );
-        }
-        // move tree pointer to right
-        tree = tree->right;
+      else {
+        cat_val.set(tree->range.set.set_vals);
+        result.add(cat_val, tree->range.col);
       }
+      current_node = tree->left;
     }
+    // iif we go right instead
+    else {
+      if(tree->range.type) {
+        num_val.set(tree->range.range.middle_val, tree->range.range.upper_val);
+        result.add(num_val, tree->range.col);
+      }
+      else {
+        cat_val.set(tree->range.set.out_vals);
+        result.add(cat_val, tree->range.col);
+      }
+      current_node = tree->right;
+    }
+  }
   return result;
 }
 
@@ -184,8 +184,9 @@ public:
       }
     }
     // declare split
-    auto split_res = this->node_splitter(col, this->X, row_ids, this->gen);
-    tree->range = split_res;
+    // auto split_res = this->node_splitter(col, this->X, row_ids, this->gen);
+    // tree->range = split_res;
+    tree->range = this->node_splitter(col, this->X, row_ids, this->gen);
     auto res = X.match(tree->range, row_ids);
     // if we fail to produce 2 children, stop
     if( res.left.size() > tree_min_nodesize &&
@@ -205,7 +206,7 @@ public:
                          std::vector<encoded> & encoded_vals,
                          storage::DataFrame<float, int> &newx ) {
     // if we reach NULL, we are in a terminal node
-    if( current_node->left == NULL || current_node->right == NULL ) {
+    if( current_node->left ==  nullptr || current_node->right == nullptr ) {
       for( auto &index:current_obs ) {
         // this move should be save - this is not getting reused afterwards
         encoded_vals[index].observation_id = std::move(index);
@@ -242,24 +243,25 @@ public:
     for( auto &item:terminal ) {
       all_paths.push_back(find_tree_path(item));
     }
+    // return all_paths;
 
     std::vector<terminal_node<float, int>> decoding_paths;
     decoding_paths.reserve(all_paths.size());
+
     // over all paths, get the terminal node values
     for( auto &path:all_paths ) {
       decoding_paths.push_back(decode_terminal_path(this->tree, path));
     }
 
-    std::vector<decoded> result;
+    std::vector<decoded> result(decoding_paths.size());
     for( int i=0; i < decoding_paths.size(); i++ ) {
       result[i].decoded_values = decoding_paths[i];
       result[i].observation_ids = match_terminal_nodes( terminal_ids, terminal[i]);
     }
-
     return result;
   }
   void print_recursion( node* current_node, int depth = 1) {
-    if( current_node == NULL ) {
+    if( current_node == nullptr ) {
       return;
     }
     for( int i=0; i < depth; i++) {

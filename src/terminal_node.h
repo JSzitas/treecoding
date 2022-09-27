@@ -1,18 +1,33 @@
 #ifndef TERMINAL_HEADER
 #define TERMINAL_HEADER
 
+#include <vector>
 #include "ranges.h"
 
 template <typename Numeric> struct NumInterval {
   NumInterval(){};
-  NumInterval<Numeric>( Numeric upper, Numeric lower ) : upper(upper), lower(lower){};
+  NumInterval<Numeric>( Numeric upper, Numeric lower ) {
+    this->lower = lower;
+    this->upper = upper;
+  };
+  void set( Numeric upper, Numeric lower ) {
+    this->lower = lower;
+    this->upper = upper;
+  }
   Numeric upper, lower;
 };
 
 template <typename Categorical> struct CatSet {
-  CatSet(){};
-  CatSet<Categorical>( std::vector<Categorical> set ) : set(set) {};
-  std::vector<Categorical> set;
+  CatSet(){
+    this->val_set = std::vector<Categorical>(0);
+  };
+  CatSet<Categorical>( std::vector<Categorical> set ) {
+    this->val_set = set;
+  }
+  void set(std::vector<Categorical> set) {
+    this->val_set = set;
+  }
+  std::vector<Categorical> val_set;
 };
 
 template <typename Numeric, typename Categorical> struct terminal_node {
@@ -46,14 +61,6 @@ template <typename Numeric, typename Categorical> struct terminal_node {
     // if not present, add it to the set
     CatSets.push_back(newbox);
   };
-  void print() {
-    for( int i=0; i < NumIntervals.size(); i++ ) {
-      NumIntervals[i].print();
-    }
-    for( int i=0; i < CatSets.size(); i++ ) {
-      CatSets[i].print();
-    }
-  }
 private:
   std::vector<interval_box<NumInterval<Numeric>>> NumIntervals;
   std::vector<interval_box<CatSet<Categorical>>> CatSets;

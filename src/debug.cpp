@@ -11,7 +11,6 @@ using namespace Rcpp;
 
 // [[Rcpp::plugins("cpp17")]]
 
-// [[Rcpp::export]]
 void debug_ranges() {
   NumericInterval<float> num_x(-0.4, 1.2);
   CategoricalSet<int> cat_x( std::vector<int>{0,2,6} );
@@ -26,6 +25,21 @@ void debug_ranges() {
   intv.print();
 }
 
+void debug_boxed_ranges() {
+  terminal_node<float,int> mynode;
+
+  NumInterval<float> num_x(-0.4, 1.2);
+  CatSet<int> cat_x( std::vector<int>{0,2,6} );
+  CatSet<int> cat_x2( std::vector<int>{ 1,7,19} );
+  NumInterval<float> num_x2( 1.2, 7.2 );
+
+  mynode.add(num_x, 1);
+  mynode.add(num_x2, 3);
+  mynode.add(cat_x, 7);
+  mynode.add(cat_x2, 8);
+}
+
+
 // [[Rcpp::export]]
 void tree(std::vector<std::vector<float>> num_cols,
                 std::vector<std::vector<int>> cat_cols,
@@ -39,27 +53,24 @@ void tree(std::vector<std::vector<float>> num_cols,
   tree.fit();
   // encode
   auto res = tree.encode( X );
-  for( auto &item:res ) {
-    item.print();
-  }
+  // for( auto &item:res ) {
+    // item.print();
+  // }
   // decode
-
+  tree.decode(res);
+  // for(auto &range:decoded_ranges) {
+  //   print_vector(range);
+  // }
+  // auto directions = tree.decoding_directions(decoded_ranges);
+  // for(auto &range:directions) {
+  //   print_vector(range);
+  // }
 
   // print
-  tree.print();
+  // tree.print();
 
   // verify decoding results
 }
-
-// [[Rcpp::export]]
-void test_splitbox( std::vector<int> x ) {
-  recurrent rec;
-  auto res = split_set(x, rec);
-  // return res.left;
-  // print_vector(res.left);
-  // print_vector(res.right);
-}
-
 
 
 
