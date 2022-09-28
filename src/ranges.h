@@ -76,9 +76,11 @@ template <typename T> struct NumericInterval{
     upper_val = range.upper;
     middle_val = (range.upper-range.lower)/2;
   };
+#ifdef DEBUG
   void print() {
     std::cout << "Range with values: " << lower_val << " to " << upper_val;
   }
+#endif
   T lower_val, middle_val, upper_val;
 };
 
@@ -104,12 +106,14 @@ template <typename T> struct CategoricalSet{
   void reserve(int x) {
     set_vals.reserve(x);
   }
+#ifdef DEBUG
   void print() {
     std::cout << "Set with values: ";
     for( auto &item:set_vals ) {
       std::cout << item << ", ";
     }
   }
+#endif
   std::vector<T> set_vals;
   std::vector<T> out_vals;
 };
@@ -127,11 +131,13 @@ template <class T> struct interval_box{
     this->interval = T();
     this->col = 0;
   }
+#ifdef DEBUG
   void print() {
     std::cout << "Interval ";
     interval.print();
     std::cout << " at column " << col << std::endl;
   }
+#endif
   T interval;
   int col;
 };
@@ -167,6 +173,7 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
     // if not present, add it to the set
     CategoricalSets.push_back(newbox);
   };
+#ifdef DEBUG
   void print() {
     for( int i=0; i < NumericIntervals.size(); i++ ) {
       NumericIntervals[i].print();
@@ -175,6 +182,7 @@ template <typename NumericKind, typename CategoricKind > struct intervals {
       CategoricalSets[i].print();
     }
   }
+#endif
   private:
     std::vector<interval_box<NumericInterval<NumericKind>>> NumericIntervals;
     std::vector<interval_box<CategoricalSet<CategoricKind>>> CategoricalSets;

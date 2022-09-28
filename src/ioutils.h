@@ -1,6 +1,7 @@
 #ifndef IO_UTILS
 #define IO_UTILS
 
+#ifdef DEBUG
 #include "stdio.h"
 #include "iostream"
 
@@ -13,5 +14,6 @@ template <class T> void print_vector( T& x ) {
   }
   std::cout << x[(x.size()-1)] << std::endl;
 }
+#endif
 
 #endif

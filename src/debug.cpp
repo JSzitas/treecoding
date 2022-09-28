@@ -22,7 +22,7 @@ void debug_ranges() {
   intv.add(num_x2, 3);
   intv.add(cat_x, 7);
   intv.add(cat_x2, 8);
-  intv.print();
+  // intv.print();
 }
 
 void debug_boxed_ranges() {

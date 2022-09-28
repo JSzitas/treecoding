@@ -81,7 +81,4 @@ template <class T, class Generator> split_box<T> split_set( T &set,
     return result;
 }
 
-
-
-
 #endif

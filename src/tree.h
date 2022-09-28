@@ -28,9 +28,11 @@ struct encoded {
     this->observation_id = 0;
     this->node_id = 0;
   };
+#ifdef DEBUG
   void print() {
     std::cout << "Node: " << node_id << " Observation: "<< observation_id << std::endl;
   }
+#endif
   int observation_id;
   int node_id;
 };
@@ -260,6 +262,7 @@ public:
     }
     return result;
   }
+#ifdef DEBUG
   void print_recursion( node* current_node, int depth = 1) {
     if( current_node == nullptr ) {
       return;
@@ -274,6 +277,7 @@ public:
   void print() {
     print_recursion( this->tree, 1);
   }
+#endif
   // void predict();
 private:
   int tree_max_depth;
