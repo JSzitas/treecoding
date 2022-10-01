@@ -24,8 +24,11 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP _rcpp_module_boot_RandomTreeQRN();
+
 static const R_CallMethodDef CallEntries[] = {
     {"_treecoding_tree", (DL_FUNC) &_treecoding_tree, 4},
+    {"_rcpp_module_boot_RandomTreeQRN", (DL_FUNC) &_rcpp_module_boot_RandomTreeQRN, 0},
     {NULL, NULL, 0}
 };
 
