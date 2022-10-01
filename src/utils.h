@@ -12,8 +12,8 @@ template <class T, typename U = int> std::vector<U> distinct( T &a ) {
   // result.reserve(a.size());
   // using std::set
   std::unordered_set<U> uniques;
-  int current_size = 0;
-  for( int i=0; i< a.size(); i++) {
+  long long unsigned int current_size = 0;
+  for( long long unsigned int i=0; i< a.size(); i++) {
     uniques.insert(a[i]);
     if( uniques.size() > current_size ) {
       current_size++;
@@ -32,7 +32,7 @@ template <class T, typename U = int> std::vector<U> distinct( T &a, std::vector<
   // result.reserve(a.size());
   // using std::set
   std::unordered_set<U> uniques;
-  int current_size = 0;
+  long long unsigned int current_size = 0;
   for( auto &i:view) {
     uniques.insert(a[i]);
     if( uniques.size() > current_size ) {
@@ -46,8 +46,8 @@ template <class T, typename U = int> std::vector<U> distinct( T &a, std::vector<
 std::vector<int> sequence( int size ) {
   std::vector<int> result;
   result.reserve(size);
-  int item = 0;
-  for( int i = 0; i < size; i++) {
+  long long unsigned int item = 0;
+  for( long long unsigned int i = 0; i < size; i++) {
     result.push_back(item);
     item++;
   }
@@ -59,7 +59,7 @@ template <typename T> bool is_same( T &a, T &b, float tol = 0.000001 ) {
 }
 
 template <class Container, typename Element> bool belongs( Container x, Element y ) {
-  for( int i=0; i< x.size(); i++ ) {
+  for( long long unsigned int i=0; i< x.size(); i++ ) {
     if( is_same( x[i], y)) {
       return true;
     }
@@ -93,7 +93,7 @@ template <class T, typename U=int> T set_diff( T &x, U &y) {
 // I anticipate we will be doing. Hopefully you can return to this later and
 // check this assummption
 template <class T> bool all_const( T &a ) {
-  for( int i=1; i < a.size(); i++) {
+  for( long long unsigned int i=1; i < a.size(); i++) {
     if( !is_same(a[i], a[0]) ) {
       return false;
     }
@@ -102,7 +102,7 @@ template <class T> bool all_const( T &a ) {
 }
 
 template <class T> bool all_const_view( T &a, std::vector<int> & view ) {
-  for( int i=0; i< view.size();i++) {
+  for( long long unsigned int i=0; i< view.size();i++) {
     if( !is_same(a[view[i]], a[view[0]]) ) {
       return false;
     }
@@ -155,7 +155,7 @@ template <typename T> void swap( T &a, T&b ) {
 }
 
 template <class T> void reverse( T &a ) {
-  for( int i=0; i < a.size()/2; i++ ) {
+  for( long long unsigned int i=0; i < a.size()/2; i++ ) {
     swap( a[i], a[a.size()-1 -i]);
   }
 }

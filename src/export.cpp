@@ -35,7 +35,7 @@ private:
   storage::DataFrame<float,int> X;
 };
 
-RCPP_EXPOSED_CLASS_NODECL(RandomTreeQRN);
+RCPP_EXPOSED_CLASS_NODECL(RandomTreeQRN)
 RCPP_MODULE(RandomTreeQRN) {
   // using namespace Rcpp;
 
