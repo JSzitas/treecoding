@@ -55,18 +55,18 @@ struct recurrent {
     seed = 0.5;
     alpha = 0.618034;
     z = alpha + seed;
-    z -= (float)(int)(z);
+    z -= (double)(int)(z);
   };
-  recurrent( float init_seed ) {
+  recurrent( double init_seed ) {
     seed = init_seed;
     alpha = 0.618034;
     z = alpha + seed;
-    z -= (float)(int)(z);
+    z -= (double)(int)(z);
   };
-  float yield() {
+  double yield() {
     z = (z+alpha);
     // a slightly evil way to do z % 1 with floats
-    z -= (float)(int)(z);
+    z -= (double)(int)(z);
     return z;
   };
   void reset(){
@@ -75,7 +75,7 @@ struct recurrent {
     z = 0;
   };
   private:
-    float alpha = 0.618034, seed = 0.5, z = 0;
+    double alpha = 0.618034, seed = 0.5, z = 0;
   //   float phi(int d = 1) {
   //     float x = 2.0;
   //     for( int i=0; i< 15; i++) {

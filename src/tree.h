@@ -6,6 +6,7 @@
 #include "ranges.h"
 #include "data.h"
 #include "terminal_node.h"
+#include "sampling.h"
 
 struct node {
   node() {
