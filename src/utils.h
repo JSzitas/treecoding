@@ -54,8 +54,19 @@ std::vector<int> sequence( int size ) {
   return result;
 }
 
-template <typename T> bool is_same( T &a, T &b, float tol = 0.000001 ) {
-  return (float)(a - b) < tol;
+template <typename T> T abs( T x) {
+  if( x < 0.0 ) {
+    x = x - 2*x;
+  }
+  return x;
+}
+
+template <typename T> bool is_same( T &a, T &b, T tol = 0.000001 ) {
+  return abs(a - b) < tol;
+}
+
+bool is_same( int &a, int &b ) {
+  return a ==b;
 }
 
 template <class Container, typename Element> bool belongs( Container x, Element y ) {
