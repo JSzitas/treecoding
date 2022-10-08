@@ -6,6 +6,7 @@
 #include "ranges.h"
 #include "data.h"
 #include "terminal_node.h"
+#include "sampling.h"
 
 struct node {
   node() {
@@ -82,27 +83,29 @@ terminal_node<float, int> decode_terminal_path( node *tree,
     // this determines if we go left or right
     if(path[i] % 2 == 0) {
       // determine if we are assigning a categorical or numeric value
-      if(tree->range.type) {
-        num_val.set(tree->range.range.lower_val, tree->range.range.middle_val);
-        result.add(num_val, tree->range.col);
+      if(current_node->range.type) {
+        num_val.set(current_node->range.range.lower_val,
+                    current_node->range.range.middle_val);
+        result.add(num_val, current_node->range.col);
       }
       else {
-        cat_val.set(tree->range.set.set_vals);
-        result.add(cat_val, tree->range.col);
+        cat_val.set(current_node->range.set.set_vals);
+        result.add(cat_val, current_node->range.col);
       }
-      current_node = tree->left;
+      current_node = current_node->left;
     }
     // iif we go right instead
     else {
-      if(tree->range.type) {
-        num_val.set(tree->range.range.middle_val, tree->range.range.upper_val);
-        result.add(num_val, tree->range.col);
+      if(current_node->range.type) {
+        num_val.set(current_node->range.range.middle_val,
+                    current_node->range.range.upper_val);
+        result.add(num_val, current_node->range.col);
       }
       else {
-        cat_val.set(tree->range.set.out_vals);
-        result.add(cat_val, tree->range.col);
+        cat_val.set(current_node->range.set.out_vals);
+        result.add(cat_val, current_node->range.col);
       }
-      current_node = tree->right;
+      current_node = current_node->right;
     }
   }
   return result;
@@ -156,8 +159,8 @@ public:
     storage::DataFrame<float, int> &data,
     RngGenerator & generator,
     Splitter & splitter,
-    int max_depth = 8,
-    int min_nodesize = 30) : tree_max_depth(max_depth),
+    long long unsigned int max_depth = 8,
+    long long unsigned int min_nodesize = 30) : tree_max_depth(max_depth),
     tree_min_nodesize(min_nodesize), X(data),
     node_splitter(splitter), gen(generator) {
     nonconst_cols = data.nonconst_cols();
@@ -169,7 +172,7 @@ public:
     node * tree = new node();
     tree->node_id = id;
     int col=0;
-    for( int i=0; i < nonconst_cols.size(); i++ ){
+    for( long long unsigned int i=0; i < nonconst_cols.size(); i++ ){
       // if we have no nonconst columns, return
       if( nonconst_cols.size() < 1 ) {
         return tree;
@@ -280,8 +283,8 @@ public:
 #endif
   // void predict();
 private:
-  int tree_max_depth;
-  int tree_min_nodesize;
+  long long unsigned int tree_max_depth;
+  long long unsigned int tree_min_nodesize;
   storage::DataFrame<float, int> &X;
   node *tree;
   Splitter &node_splitter;

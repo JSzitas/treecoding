@@ -39,7 +39,19 @@ template <typename T, class Generator> std::vector<T> sample_rows( const std::ve
 template <class T, class U> int sample_int_from_set( T set, U & generator ) {
   // the -1 is absolutely necessary - if you try to access set[ set.size() ],
   // this explodes
-  return set[ (int)(generator.yield() * (float)set.size())];
+  // double sample = generator.yield();
+  // if( sample < 0 ) {
+  //   sample = 0.0;
+  // }
+  // float st_sz = (float)(set.size());
+  // int el_accessed = (int)(sample * st_sz);
+  // int pick = (int)(sample * (double)set.size());
+  // if( pick > (set.size()-1) ) {
+  //   std::cout << sample << std::endl;
+  //   std::cout << set.size() << std::endl;
+  //   std::cout << pick << std::endl;
+  // }
+  return set[(int)(generator.yield() * (double)set.size())];
 }
 
 template <typename CategoricKind, class Rng> CategoricalSet<CategoricKind> sample_distinct(

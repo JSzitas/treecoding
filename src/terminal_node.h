@@ -39,7 +39,7 @@ template <typename Numeric, typename Categorical> struct terminal_node {
     interval_box<NumInterval<Numeric>> newbox;
     newbox.interval = x;
     newbox.col = col;
-    for( int i=0; i < NumIntervals.size(); i++ ) {
+    for( long long unsigned int i=0; i < NumIntervals.size(); i++ ) {
       if( col == NumIntervals[i].col) {
         NumIntervals[i] = newbox;
         return;
@@ -52,7 +52,7 @@ template <typename Numeric, typename Categorical> struct terminal_node {
     interval_box<CatSet<Categorical>> newbox;
     newbox.interval = x;
     newbox.col = col;
-    for( int i=0; i < CatSets.size(); i++ ) {
+    for( long long unsigned int i=0; i < CatSets.size(); i++ ) {
       if( col == CatSets[i].col) {
         CatSets[i] = newbox;
         return;
