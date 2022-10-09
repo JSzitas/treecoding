@@ -24,6 +24,6 @@ Suggests:
     covr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-LinkingTo: 
-    Rcpp
+LinkingTo: Rcpp
+NeedsCompilation: yes
 SystemRequirements: C++17
