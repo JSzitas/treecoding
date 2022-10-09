@@ -159,9 +159,10 @@ public:
     storage::DataFrame<float, int> &data,
     RngGenerator & generator,
     Splitter & splitter,
+    std::vector<int> rows,
     long long unsigned int max_depth = 8,
     long long unsigned int min_nodesize = 30) : tree_max_depth(max_depth),
-    tree_min_nodesize(min_nodesize), X(data),
+    tree_min_nodesize(min_nodesize), row_ids(rows), X(data),
     node_splitter(splitter), gen(generator) {
     nonconst_cols = data.nonconst_cols();
   };
@@ -203,8 +204,7 @@ public:
     return tree;
   }
   void fit() {
-    auto seq = sequence(this->X.rows());
-    this->tree = grow( seq, this->nonconst_cols );
+    this->tree = grow( this->row_ids, this->nonconst_cols );
   };
   void encode_recursion( node* current_node,
                          std::vector<int> &current_obs,
@@ -226,9 +226,10 @@ public:
   }
   // // creating predictions
   std::vector<encoded> encode( storage::DataFrame<float, int> &newx ) {
-    auto seq = sequence( newx.rows() );
+    auto size = newx.rows();
+    auto seq = sequence( size );
     // preallocate newx rows encoding results
-    std::vector<encoded> result( newx.rows() );
+    std::vector<encoded> result( size );
     // recurse through them - hopefully the references here make sense
     encode_recursion( this->tree, seq, result, newx);
     return result;
@@ -265,6 +266,11 @@ public:
     }
     return result;
   }
+  std::vector<int> get_oob_obs() {
+    auto size = this->X.rows();
+    auto seq = sequence(size);
+    return set_diff(seq, this->row_ids);
+  }
 #ifdef DEBUG
   void print_recursion( node* current_node, int depth = 1) {
     if( current_node == nullptr ) {
@@ -285,6 +291,7 @@ public:
 private:
   long long unsigned int tree_max_depth;
   long long unsigned int tree_min_nodesize;
+  std::vector<int> row_ids;
   storage::DataFrame<float, int> &X;
   node *tree;
   Splitter &node_splitter;

@@ -3,6 +3,7 @@ using namespace Rcpp;
 #include "tree.h"
 #include "data.h"
 #include "rng.h"
+#include "utils.h"
 
 // [[Rcpp::plugins("cpp17")]]
 
@@ -17,7 +18,11 @@ public:
     this->X = storage::DataFrame<float,int>( num_cols, cat_cols, targ );
     RandomSplitter<float, int> splittr{};
     recurrent gen;
-    this->tree = new Tree<recurrent, RandomSplitter<float,int>>(this->X, gen, splittr, max_depth, min_nodesz);
+    auto size = this->X.rows();
+    auto seq = sequence(size);
+    this->tree = new Tree<recurrent, RandomSplitter<float,int>>(this->X, gen,
+                                                                splittr, seq,
+                                                                max_depth, min_nodesz);
   }
   ~RandomTreeQRN(){
     if( tree != nullptr ) {

@@ -43,11 +43,11 @@ template <class T, typename U = int> std::vector<U> distinct( T &a, std::vector<
   return result;
 }
 
-std::vector<int> sequence( int size ) {
-  std::vector<int> result;
+template <typename T=int> std::vector<T> sequence( T &size ) {
+  std::vector<T> result;
   result.reserve(size);
-  long long unsigned int item = 0;
-  for( long long unsigned int i = 0; i < size; i++) {
+  T item = 0;
+  for( T i = 0; i < size; i++) {
     result.push_back(item);
     item++;
   }

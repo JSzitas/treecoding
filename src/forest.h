@@ -6,30 +6,55 @@
 #include <vector>
 #include "utils.h"
 
+// struct forest_encoded {
+//   forest_encoded(int i) {
+//     this->encoded = std::vector<std::vector<encoded>>(i);
+//   }
+//   void add(std::vector<encoded> x, int i) {
+//     this->encoded[i] = x;
+//   }
+//   std::vector<std::vector<encoded>> encoded;
+// };
+
 template <class RngGenerator, class Splitter,
           typename Numerical, typename Categorical> class Forest {
   Forest( storage::DataFrame<Numerical, Categorical> data,
           RngGenerator & generator,
           Splitter & splitter,
-          int max_depth = 4,
-          int min_nodesize = 100,
-          int num_trees = 100 ) : X(data), gen(generator), node_splitter(splitter),
+          long long unsigned int subsample_size,
+          long long unsigned int max_depth = 4,
+          long long unsigned int min_nodesize = 100,
+          long long unsigned int num_trees = 100 ) : X(data), gen(generator),
+          node_splitter(splitter), subsample_size(subsample_size),
           tree_max_depth(max_depth), tree_min_nodesize(min_nodesize),
-          forest_num_trees(num_trees){};
-  void grow(){
-
-    std::vector<Tree<RngGenerator,Splitter>> forest(forest_num_trees);
-    for(int i=0; i<this->forest_num_trees; i++) {
-      // auto rows = sample_rows( sequence(0, data.rows(), 1), 10);
-      // Tree( num_data, cat_data );
+          forest_num_trees(num_trees) {
+    this->forest = std::vector<Tree<RngGenerator,Splitter>>(forest_num_trees);
+    for(unsigned long long int i=0; i<this->forest_num_trees; i++) {
+      auto rows = sample_rows( sequence(0, X.rows(), 1), this->subsample_size);
+      this->forest[i] = Tree( this->X, this->gen, this->node_splitter, rows,
+                        this->tree_max_depth, this->tree_min_nodesize);
     }
-
-  };
+  }
+  void grow(){
+    for(unsigned long long int i=0; i<this->forest_num_trees; i++) {
+      this->forest[i].grow();
+    }
+  }
+  std::vector<std::vector<encoded>> encode( storage::DataFrame<float, int> &newx ) {
+    std::vector<std::vector<encoded>> result(this->forest_num_trees);
+    for( unsigned long long int i=0; i<this->forest_num_trees; i++ ) {
+      result[i] = this->forest[i].encode(newx);
+    }
+    return result;
+  }
+  storage::DataFrame<float, int> decode( std::vector<std::vector<encoded>> x ) {
+    
+  }
   private:
     storage::DataFrame<Numerical, Categorical> X;
-    // std::vector<Tree<RngGenerator>> trees;
     RngGenerator &gen;
     Splitter &node_splitter;
+    long long unsigned int subsample_size;
     long long unsigned int tree_max_depth;
     long long unsigned int tree_min_nodesize;
     long long unsigned int forest_num_trees;
