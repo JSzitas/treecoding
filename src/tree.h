@@ -40,13 +40,11 @@ struct encoded {
 
 struct decoded {
   decoded(){
-    // this->node_id = 0;
     this->observation_ids = std::vector<int>(0);
     this->decoded_values = terminal_node<float, int>();
   };
   terminal_node<float, int> decoded_values;
   std::vector<int> observation_ids;
-  // int node_id;
 };
 
 std::vector<int> find_tree_path( int terminal_id ) {

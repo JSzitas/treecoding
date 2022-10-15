@@ -43,6 +43,20 @@ template <class T, typename U = int> std::vector<U> distinct( T &a, std::vector<
   return result;
 }
 
+template <typename T> std::vector<T> intersect( std::vector<T> &a,
+                                                std::vector<T> &b) {
+  std::unordered_set<T> comp_set(a.begin(), a.end());
+  std::vector<T> result;
+  result.reserve(max(a.size(), b.size()));
+  for( auto&val:b ) {
+    if( comp_set.count(val) ) {
+      result.push_back(val);
+    }
+  }
+  return result;
+}
+
+
 template <typename T=int> std::vector<T> sequence( T &size ) {
   std::vector<T> result;
   result.reserve(size);
@@ -66,7 +80,7 @@ template <typename T> bool is_same( T &a, T &b, T tol = 0.000001 ) {
 }
 
 bool is_same( int &a, int &b ) {
-  return a ==b;
+  return a == b;
 }
 
 template <class Container, typename Element> bool belongs( Container x, Element y ) {
@@ -187,6 +201,20 @@ template <typename T> std::vector<T> set_to_vect(std::unordered_set<T> &x) {
     result.push_back(std::move(x.extract(it++).value()));
   }
   return result;
+}
+
+template <typename T> T min( T &a, T &b ) {
+  if( a < b ) {
+    return a;
+  }
+  return b;
+}
+
+template <typename T> T max( T &a, T &b ) {
+  if( a < b ) {
+    return b;
+  }
+  return a;
 }
 
 #endif

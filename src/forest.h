@@ -48,7 +48,22 @@ template <class RngGenerator, class Splitter,
     return result;
   }
   storage::DataFrame<float, int> decode( std::vector<std::vector<encoded>> x ) {
-    
+
+    // get decoded values from first tree - then reconcile these with the values
+    // from the second tree
+
+    // for( auto &tree:forest ) {
+    //
+    // }
+
+    // std::vector<std::vector<float>> numerics;
+    // std::vector<std::vector<int>> categoricals;
+    // std::vector<std::vector<float>> targets;
+
+    // storage::DataFrame<float, int> result(  );
+
+
+
   }
   private:
     storage::DataFrame<Numerical, Categorical> X;
