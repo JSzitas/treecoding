@@ -42,7 +42,7 @@ template <class T, typename U=float> NumericRange<U> min_max_subset( T &a,
   result.lower = a[subset[0]];
   result.upper = a[subset[0]];
 
-  for( int i=1; i < subset.size(); i++ ) {
+  for( unsigned long long i=1; i < subset.size(); i++ ) {
     if( a[i] < result.lower) {
       result.lower = a[subset[i]];
     }
