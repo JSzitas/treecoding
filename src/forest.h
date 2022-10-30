@@ -42,7 +42,7 @@ template <class RngGenerator, class Splitter,
   }
   std::vector<std::vector<encoded>> encode( storage::DataFrame<float, int> &newx ) {
     std::vector<std::vector<encoded>> result(this->forest_num_trees);
-    for( unsigned long long int i=0; i<this->forest_num_trees; i++ ) {
+    for( unsigned long long int i=0; i < this->forest_num_trees; i++ ) {
       result[i] = this->forest[i].encode(newx);
     }
     return result;
