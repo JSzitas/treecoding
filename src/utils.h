@@ -47,7 +47,7 @@ template <typename T> std::vector<T> intersect( std::vector<T> &a,
                                                 std::vector<T> &b) {
   std::unordered_set<T> comp_set(a.begin(), a.end());
   std::vector<T> result;
-  result.reserve(max(a.size(), b.size()));
+  result.reserve(min(a.size(), b.size()));
   for( auto&val:b ) {
     if( comp_set.count(val) ) {
       result.push_back(val);

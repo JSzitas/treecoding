@@ -51,7 +51,6 @@ template <class RngGenerator, class Splitter,
 
     // get decoded values from first tree - then reconcile these with the values
     // from the second tree
-
     // for( auto &tree:forest ) {
     //
     // }
