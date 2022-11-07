@@ -77,7 +77,7 @@ terminal_node<float, int> decode_terminal_path( node *tree,
   NumInterval<float> num_val;
   CatSet<int> cat_val;
   node * current_node = tree;
-  for( int i=1; i < path.size(); i++) {
+  for( unsigned long long i=1; i < path.size(); i++) {
     // this determines if we go left or right
     if(path[i] % 2 == 0) {
       // determine if we are assigning a categorical or numeric value
