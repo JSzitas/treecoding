@@ -119,7 +119,10 @@ template <typename T> struct CategoricalSet{
 };
 
 template <typename NumericKind, typename CategoricKind> struct node_split {
-  node_split<NumericKind, CategoricKind>(){};
+  node_split<NumericKind, CategoricKind>(){
+    this->range = NumericInterval<NumericKind>();
+    this->set = CategoricalSet<CategoricKind>();
+  };
   NumericInterval<NumericKind> range;
   CategoricalSet<CategoricKind> set;
   int col;
