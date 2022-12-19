@@ -16,6 +16,9 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 # treecoding
 
+Currently on hold at least until the end of December 2022, possibly a bit longer. 
+
+
 Really random trees for encoding (& decoding), isolation, and possibly
 more.
 
